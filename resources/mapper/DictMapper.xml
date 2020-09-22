@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Dict">
+	<resultMap type="com.netcity.module.entity.DictEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="dictName" property="dictName" />
+		<result column="dictType" property="dictType" />
+		<result column="dictLabel" property="dictLabel" />
+		<result column="dictValue" property="dictValue" />
+	</resultMap>
+
+
+
+	<select id="queryDictByDictType" resultMap="BookResultMap" parameterType="com.netcity.module.entity.DictEntity">
+	SELECT
+		a.id,
+		b.dictName,
+		a.dictType,
+		a.dictLabel,
+		a.dictValue
+	FROM
+	 ex_dict_data a
+		LEFT JOIN ex_dict_type b ON a.dictType = b.dictType
+		WHERE
+		a.dictType = #{dictType}
+	</select>
+
+	<select id="queryDictNameByDictValue" resultMap="BookResultMap" parameterType="com.netcity.module.entity.DictEntity">
+	SELECT
+		id,
+		dictType,
+		dictLabel,
+		dictValue
+	FROM
+		ex_dict_data
+		WHERE
+		dictType = #{dictType}
+		and
+		dictValue  = #{dictValue}
+	</select>
+
+
+
+</mapper>

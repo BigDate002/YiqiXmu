@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.User">
+	<resultMap type="com.netcity.module.entity.UserEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="usercode" property="usercode" />
+		<result column="name" property="name" />
+		<result column="sex" property="sex" />
+		<result column="roleId" property="roleId" />
+		<result column="deptId" property="deptId" />
+		<result column="dept" property="dept" />
+		<result column="password" property="password" />
+		<result column="userState" property="userState" />
+		<result column="remark" property="remark" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<result column="positionName" property="positionName" />
+		<result column="departmentId" property="departmentId" />
+		<result column="department" property="department" />
+		<result column="workShopId" property="workShopId" />
+		<result column="workShop" property="workShop" />
+		<result column="isDelete" property="isDelete" />
+		<result column="lastUpdateDate" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+		<result column="token" property="token" />
+		<result column="chance" property="chance" />
+		<result column="lockTime" property="lockTime" />
+	</resultMap>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="usercode!=null and usercode !=''">
+				and a.usercode = #{usercode}
+			</if>
+			<if test="token !=null and token !=''">
+				and a.token = #{token}
+			</if>
+			<if test="name!=null and name!=''">
+				and a.name = #{name}
+			</if>
+			<if test="query !=null and query !=''">
+				and (a.name like concat('%',#{query},'%') or a.usercode like concat('%',#{query},'%'))
+			</if>
+			<if test="roleId!=null">
+				and exists(select 1 from ex_user_department f where f.roleId=#{roleId} and f.deptId=a.deptId)
+			</if>
+			<if test="password!=null">
+				and a.password = #{password}
+			</if>
+			<if test="userState!=null">
+				and a.userState = #{userState}
+			</if>
+			<if test="deptId!=null">
+				and a.deptId = #{deptId}
+			</if>
+			<if test="remark!=null">
+				and a.remark = #{remark}
+			</if>
+			<if test="createUser!=null">
+				and a.createUser = #{createUser}
+			</if>
+			<if test="createDate!=null">
+				and a.createDate = #{createDate}
+			</if>
+			<if test="dept !=null and dept !=''">
+				and b.name like '${dept}%'
+			</if>
+			<if test="workShop !=null and workShop !=''">
+				and ((c.name like '${workShop}%' and d.level='二级') or (b.name like '${workShop}%' and d.level!='二级'))
+			</if>
+			<if test="department !=null and department !=''">
+				and ((d.name like '${department}%' and d.level='二级') or (c.name like '${department}%' and d.level!='二级'))
+			</if>
+			<if test="departmentId !=null and departmentId!=1">
+				and (b.code = #{departmentId} or c.code = #{departmentId} or d.code = #{departmentId} or #{departmentId} = 3756)
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.UserEntity" parameterType="java.lang.Long">
+		select
+		 a.id
+		,a.usercode
+		,a.name
+		,a.sex
+		,a.isDelete
+		,a.password
+		,case b.level when '四级' then b.code else null end as deptId
+		,a.roleId
+		,a.userState
+		,a.remark
+		,a.createUser
+		,a.createDate
+		,e.name as role
+		,case b.level when '四级' then b.name else '——' end as dept
+		,case c.level when '三级' then c.name else b.name end workShop
+		,case c.level when '三级' then c.code else b.code end as workShopId
+		,case d.level when '二级' then d.code else c.code end as departmentId
+		,case d.level when '二级' then d.name else c.name end as department
+		from
+		ex_user a
+		left join ex_department b on a.deptId=b.code
+		left join ex_department c on b.parentId=c.code
+		left join ex_department d on c.parentId=d.code
+		left join ex_role e on a.roleId=e.id
+		where a.id = #{id}
+	</select>
+	<select id="selectByEntity" resultMap="BookResultMap" parameterType="com.netcity.module.entity.UserEntity">
+		select
+		 a.id
+		,a.usercode
+		,a.name
+		,a.sex
+		,a.isDelete
+		,a.password
+		,case b.level when '四级' then b.code else null end as deptId
+		,a.roleId
+		,a.userState
+		,a.remark
+		,a.createUser
+		,a.createDate
+		,e.name as role
+		,case b.level when '四级' then b.name else '——' end as dept
+		,case c.level when '三级' then c.name else b.name end workShop
+		,case c.level when '三级' then c.code else b.code end as workShopId
+		,case d.level when '二级' then d.code else c.code end as departmentId
+		,case d.level when '二级' then d.name else c.name end as department
+		,a.token
+		,a.lockTime
+		,a.chance
+		from
+		ex_user a
+		left join ex_department b on a.deptId=b.code
+		left join ex_department c on b.parentId=c.code
+		left join ex_department d on c.parentId=d.code
+		left join ex_role e on a.roleId=e.id
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.UserEntity" parameterType="java.util.Map">
+		select * from ex_user a
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.UserEntity">
+		update ex_user
+		<set>
+			<if test="usercode!=null">
+				usercode = #{usercode},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="token !=null">
+				token = #{token},
+			</if>
+			<if test="sex !=null">
+				sex = #{sex},
+			</if>
+			<if test="roleId!=null">
+				roleId = #{roleId},
+			</if>
+			<if test="password!=null">
+				password = #{password},
+			</if>
+			<if test="userState!=null">
+				userState = #{userState},
+			</if>
+			<if test="remark!=null">
+				remark = #{remark},
+			</if>
+			<if test="token !=null">
+				token = #{token},
+			</if>
+			<if test="deptId !=null">
+				deptId = #{deptId},
+			</if>
+			<if test="lastUpdateDate !=null">
+				lastUpdateDate = #{lastUpdateDate},
+			</if>
+			<if test="isDelete !=null">
+				isDelete = #{isDelete},
+			</if>
+			<if test="lockTime !=null">
+				lockTime = #{lockTime},
+			</if>
+			<if test="chance !=null">
+				chance = #{chance},
+			</if>
+		</set>
+		where
+		<if test="id!=null">
+			id = #{id}
+		</if>
+		<if test="ids!=null">
+			id in (${ids})
+		</if>
+	</update>
+
+	<update id="updateByIds" parameterType="java.lang.String">
+		update ex_user
+		<set>
+			<if test="roleId!=null">
+				roleId = #{roleId},
+			</if>
+			<if test="userState!=null">
+				userState = #{userState}
+			</if>
+			<if test="isDelete !=null">
+				isDelete = #{isDelete}
+			</if>
+		</set>
+		 where id in (${_parameter})
+	</update>
+
+	<update id="updatePasswordReset" parameterType="java.lang.String">
+		update ex_user
+		set password='123456' where id in (${_parameter})
+	</update>
+
+	<update id="updateUserInfo" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator="">
+		update ex_exam_user set usercode=#{item.gwUsercode} where usercode=#{item.ycUsercode};
+		update ex_train_user set usercode=#{item.gwUsercode} where usercode=#{item.ycUsercode};
+		update ex_qualification set usercode=#{item.gwUsercode} where usercode=#{item.ycUsercode};
+		</foreach>
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from ex_user where
+		id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.UserEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into ex_user (
+			usercode,name,sex,deptId,roleId,password,userState,remark,createUser,createDate,lastUpdateDate
+		)
+		values (
+			#{usercode},#{name},#{sex},#{deptId},#{roleId},123456,1,#{remark},#{createUser},now(),#{lastUpdateDate}
+		)
+	</insert>
+
+	<insert id="insertBatchOnce" parameterType="java.util.List">
+		insert into ex_user (
+			usercode,name,sex,deptId,roleId,password,userState,remark,createUser,createDate,lastUpdateDate
+		)
+		values
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.usercode},#{item.name},#{item.sex},#{item.deptId},#{item.roleId},'123456',1,#{item.remark},
+			#{item.createUser},now(),#{item.lastUpdateDate}
+		)
+		</foreach>
+	</insert>
+	<select id="getPermissionsByUserName" parameterType="java.lang.String" resultType="java.lang.String">
+		select b.columnId
+		from ex_user a
+		join ex_role_column b on a.roleid=b.roleid
+		where usercode=#{_parameter}
+		union all
+		select concat(d.code,':',c.code) from ex_user a
+		join
+		ex_role_right b on
+		b.roleid=a.roleid
+		join ex_right c on b.rightid=c.id
+		join ex_column d on c.columnid=d.id
+		where usercode=#{_parameter}
+	</select>
+	<select id="queryOutList" resultMap="BookResultMap" parameterType="com.netcity.module.entity.UserEntity">
+		WITH DEPT AS (
+			SELECT GroupId as code,cast(G_CName as VARCHAR)as name,G_ParentID as parentId,GroupId as topID
+			FROM view_zcryzz_group WHERE (GroupId=3756 OR GroupId=5957) and G_Delete=0
+			UNION ALL
+			SELECT A.GroupId as code,cast(B.name+'-'+A.G_CName AS VARCHAR) as name,A.G_ParentID,B.topID
+			FROM view_zcryzz_group A JOIN DEPT B ON B.code=A.G_ParentID and A.G_Delete=0
+		)
+		SELECT
+			P_PersonnelNo as usercode,
+			p_nname as name,
+			code as deptId,
+			2-p_sex sex,
+			2-P_Status as userState,
+			P_Delete as isDelete,
+			updateDate as lastUpdateDate
+		FROM DEPT
+		JOIN VIEW_ZCRYZZ_PERSONNEL on P_GroupID=code
+		<where>
+			topID=3756
+			and ((updateDate &lt; '2019-07-15' and P_Status=1) or updateDate &gt; '2019-07-15')
+			<if test="lastUpdateDate!=null">
+				and updateDate &gt; #{lastUpdateDate}
+			</if>
+		</where>
+		UNION ALL
+		SELECT
+			P_PersonnelNo as usercode,
+			p_nname as name,
+			b.code as deptId,
+			2-p_sex as sex,
+			2-P_Status as userState,
+			P_Delete as isDelete,
+			updateDate as lastUpdateDate
+		FROM DEPT a
+		JOIN VIEW_ZCRYZZ_PERSONNEL ON P_GroupID = code
+		JOIN dept b on b.name=a.name and b.topID=3756
+		<where>
+			a.topID=5957
+			and ((updateDate &lt; '2019-07-15' and P_Status=1) or updateDate &gt; '2019-07-15')
+			<if test="lastUpdateDate!=null">
+				and updateDate &gt; #{lastUpdateDate}
+			</if>
+		</where>
+	</select>
+	<select id="findLastUpdateOne" resultType="com.netcity.module.entity.UserEntity">
+		select
+		id,lastUpdateDate from ex_user
+		order by lastUpdateDate desc
+		limit 0,1
+	</select>
+
+	<select id="findListByCourseId" resultType="com.netcity.module.entity.UserEntity" parameterType="java.lang.Long">
+		select
+			a.id,
+			a.usercode,
+			a.name
+		from ex_user a
+		join ex_train_user b on a.usercode=b.usercode
+		where b.refid=#{_parameter}
+		group by a.id
+	</select>
+
+	<select id="findFushenList" resultType="com.netcity.module.entity.UserEntity" parameterType="com.netcity.module.entity.UserEntity">
+		select
+		a.id,a.usercode,a.name
+		from ex_user a
+		join ex_qualification b on a.usercode=b.usercode
+		and ((endDate between date_format(sysdate(),'%Y-06-01') and date_format(sysdate(),'%Y-12-31')
+      		and sysdate() between date_format(sysdate(),'%Y-04-01') and date_format(sysdate(),'%Y-05-31'))
+		or (endDate between date_format(sysdate(),'%Y-01-01') and date_format(sysdate(),'%Y-06-01')
+    		and sysdate() between date_format(sysdate(),'%Y-11-01') and date_format(sysdate(),'%Y-11-30')))
+		and b.postionId=#{postionId}
+		and not exists(select 1 from ex_exam a1 join ex_exam_user b1 on a1.code=b1.code
+		where a1.userCode=#{postionId} and b1.userCode=a.userCode and b1.status&lt;3 and a1.type=1)
+	</select>
+
+	<select id="findUserMap" resultType="com.netcity.module.entity.UserEntity">
+		select usercode,id from ex_user
+	</select>
+
+	<delete id="deleteByIds" parameterType="java.lang.String">
+		delete from ex_user where
+		id in (${_parameter})
+	</delete>
+</mapper>

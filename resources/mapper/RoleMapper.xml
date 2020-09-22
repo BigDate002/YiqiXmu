@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Role">
+	<resultMap type="com.netcity.module.entity.RoleEntity" id="BookResultMap">
+		<result column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="remark" property="remark"/>
+		<result column="state" property="state"/>
+		<result column="createuser" property="createUser"/>
+		<result column="createdate" property="createDate"/>
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_role
+	</sql>
+	<sql id="BASE_COLUMNS">
+		id,
+		name,
+		remark,
+		state,
+		createUser,
+		createDate
+	</sql>
+	<sql id="WHERE_CLAUSE">
+    	<where>
+			<if test="id!=null">
+				and id = #{id}
+        	</if>
+			<if test="name!=null and name!=''">
+				and name = #{name}
+			</if>
+			<if test="remark!=null">
+				and remark = #{remark}
+			</if>
+			<if test="state!=null">
+				and state = #{state}
+			</if>
+		</where>
+    </sql>
+	<select id="selectById" resultType="com.netcity.module.entity.RoleEntity"
+		parameterType="java.lang.Long">
+		select <include refid="BASE_COLUMNS"></include> from <include refid="TABLE_NAME"></include> where id = #{id}
+    </select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.RoleEntity"
+		parameterType="com.netcity.module.entity.RoleEntity">
+		select <include refid="BASE_COLUMNS"></include> from <include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.RoleEntity"
+		parameterType="java.util.Map">
+		select <include refid="BASE_COLUMNS"></include> from <include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+    </select>
+	<update id="updateById" parameterType="com.netcity.module.entity.RoleEntity">
+		update <include refid="TABLE_NAME">
+		</include> set
+		<trim suffixOverrides=",">
+			<if test="name !=null ">
+				name=#{name},
+			</if>
+			<if test="remark !=null">
+				remark=#{remark},
+			</if>
+			<if test="state !=null">
+				state=#{state},
+			</if>
+		</trim>
+		where id = #{id}
+    </update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from ex_role_column where roleid = #{id}
+    </delete>
+	
+	<insert id="insert" parameterType="com.netcity.module.entity.RoleEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into <include refid="TABLE_NAME"></include> (<trim suffixOverrides=",">name,remark,createUser,createDate</trim>)
+    values (<trim suffixOverrides=",">#{name},#{remark},#{createUser},#{createDate}</trim>)
+  </insert>
+</mapper>

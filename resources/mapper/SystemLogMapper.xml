@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.SystemLog">
+	<resultMap type="com.netcity.module.entity.SystemLogEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="usercode" property="usercode" />
+		<result column="action" property="action" />
+		<result column="result" property="result" />
+		<result column="executeMillis" property="executeMillis" />
+		<result column="operateTime" property="operateTime" />
+		<result column="error" property="error" />
+		<result column="param" property="param" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		system_log
+	</sql>
+	<sql id="BASE_COLUMNS">
+		id,
+		usercode,
+		action,
+		result,
+		executeMillis,
+		operateTime,
+		error,
+		param
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="usercode!=null and usercode !=''">
+				and usercode = #{usercode}
+			</if>
+			<if test="action!=null and action !=''">
+				and action = #{action}
+			</if>
+			<if test="result!=null ">
+				and result = #{result}
+			</if>
+			<if test="executeMillis!=null ">
+				and executeMillis = #{executeMillis}
+			</if>
+			<if test="operateTime!=null ">
+				and operateTime = #{operateTime}
+			</if>
+			<if test="error!=null and error !=''">
+				and error = #{error}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.SystemLogEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.SystemLogEntity" parameterType="com.netcity.module.entity.SystemLogEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.SystemLogEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.SystemLogEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="usercode !=null">
+				usercode=#{usercode},
+			</if>
+			<if test="action !=null">
+				action=#{action},
+			</if>
+			<if test="result !=null">
+				result=#{result},
+			</if>
+			<if test="executeMillis !=null">
+				executeMillis=#{executeMillis},
+			</if>
+			<if test="operateTime !=null">
+				operateTime=#{operateTime},
+			</if>
+			<if test="error !=null">
+				error=#{error},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.SystemLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		usercode,
+		action,
+		result,
+		executeMillis,
+		error,
+		param
+		)
+		values (
+		#{usercode},
+		#{action},
+		#{result},
+		#{executeMillis},
+		#{error},
+		#{param}
+		)
+	</insert>
+</mapper>

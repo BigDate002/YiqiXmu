@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>测试评分</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/app.css"/>
+		<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+			.aaa{
+				padding:5px 15px;
+			}
+			.abc{
+				margin:5px 25px;
+			}
+			.xx{
+				padding-top:5px;
+				padding-left:10px;
+			}
+			#frm{
+				padding: 10px 15px;
+			}
+		</style>
+	<script>
+		localStorage.setItem('scorePageLoadOk','ok');
+	</script>	
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">测试评分</h1>
+		</header>
+		<div class="mui-content">
+			<form id="frm">
+			<input type="hidden" th:value="${exam.id}" name="id"/>
+			<!-- <h4>一、填空题</h4>
+			<div class="abc tiankong" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+		          <label 
+		          	th:each="item,userStat : ${papers}" 
+		          	th:if="${item.question.type} eq '填空题'"
+		          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}"
+		          	th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content.replaceAll('(_+)','<input style=&quot;border:0px;border-bottom:1px solid black;width:100px;height:20px;background-color:transparent; &quot; class=ccc type=&quot;text&quot; name=&quot;dataid&quot; />'.replaceAll('dataid',item.id))
+		          	+'('+item.score+'分)<br/>'}">
+		          </label>
+			</div>
+			<h4>二、单选题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+			    <div th:each="item,userStat : ${papers}" 
+	          	th:if="${item.question.type} eq '单选题'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content}"></h4>
+	          			<div class="mui-input-row mui-radio" th:each="x,stat : ${item.question.selections.split(' ')}">  
+						<label th:text="${x}">radio</label>   
+						<input th:value="${#strings.arraySplit(x,'.')[0]}" th:name="${item.id}" type="radio">
+					</div>
+         		</div>
+			</div>
+			<h4>三、多选题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}" 
+		          	th:if="${item.question.type} eq '多选题'"
+		          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		        <h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content}"></h4>
+          		  	<div class="mui-input-row mui-checkbox" th:each="x,stat : ${item.question.selections.split(' ')}">  
+					  <label th:text="${x}">radio</label>   
+					  <input th:value="${#strings.arraySplit(x,'.')[0]}" th:name="${item.id}" type="checkbox">
+					</div>
+				</div>
+			</div>
+			<h4>四、判断题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}" 
+	          	th:if="${item.question.type} eq '判断题'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content}"></h4>
+	          			<div class="mui-input-row mui-radio" th:each="x,stat : ${item.question.selections.split(' ')}">  
+						<label th:text="${x}">radio</label>   
+						<input th:value="${#strings.arraySplit(x,'.')[0]}" th:name="${item.id}" type="radio">
+					</div>
+         		</div>
+			</div>-->   
+			<h4>简答题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}"
+	          	th:if="${item.question.type} eq '简答题'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content+'<br/>[共'+item.score+'分]'}"></h4>
+		          	<h4 th:utext="${'&nbsp;&nbsp;&nbsp;答案:'+item.answer}"></h4>
+					<input style="-webkit-user-select: auto;" th:name="${item.id}" required type="number" th:attr="max=${item.getScore()}"  placeholder="请填写分数">
+         		</div>
+			</div>
+			<h4 th:if="${not #lists.isEmpty(p)}">实践考核</h4>
+			<div th:if="${not #lists.isEmpty(p)}" class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}"
+	          	th:if="${item.question.type} eq '理论考核项目'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<span th:utext="${item.question.content}" style="height:28px;line-height:28px;"></span><br/>
+		          	<span th:utext="${'答案:'+item.answer}" style="height:28px;line-height:28px;"></span>
+		          	<div class="mui-input-row mui-radio" style="clear:both;height:28px;width:80px;margin-left:5px;float:right;">
+		          		<input style="top:1px;left:50px;" type="radio" th:name="${item.id}" value="0"/>
+		          		<span style="height:28px;line-height:28px;">不合格</span>
+		          	</div>
+		          	<div class="mui-input-row mui-radio" style="width:70px;height:28px;float:right;padding:0">
+		          		<input style="top:1px;left:40px;" type="radio" th:name="${item.id}" value="1"/>
+		          		<span style="height:28px;line-height:28px;">合格</span>
+		          	</div>
+         		</div>
+         		<div th:each="item,userStat : ${papers}"
+	          	th:if="${item.question.type} eq '技能考核项目'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<span th:utext="${item.question.content}" style="height:28px;line-height:28px;"></span>
+		          	<div class="mui-input-row mui-radio" style="clear:both;height:28px;width:80px;margin-left:5px;float:right;">
+		          		<input style="top:1px;left:50px;" type="radio" th:name="${item.id}" value="0"/>
+		          		<span style="height:28px;line-height:28px;">不合格</span>
+		          	</div>
+		          	<div class="mui-input-row mui-radio" style="width:70px;height:28px;float:right;padding:0">
+		          		<input style="top:1px;left:40px;" type="radio" th:name="${item.id}" value="1"/>
+		          		<span style="height:28px;line-height:28px;">合格</span>
+		          	</div>
+         		</div>
+         		<div>
+		          	<span style="height:28px;line-height:28px;">技能矩阵</span>
+		          	<div class="mui-input-row mui-radio" style="width:100px;height:28px;float:right;padding:0">
+		          		<select name="score" style="top:1px;left:20px;background-color: transparent;">
+		          			<option value>请选择</option>
+		          			<option value="1">1/4</option>
+		          			<option value="2">2/4</option>
+		          			<option value="3">3/4</option>
+		          			<option value="4">4/4</option>
+		          		</select>
+		          	</div>
+         		</div>
+			</div>
+			</form>    
+		</div>
+		<div class="mui-content-padded">
+			<button id='submit' class="mui-btn mui-btn-block mui-btn-blue">保存提交</button>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script src="../plugins/jquery/jquery.serializejson.js"></script>
+	<script th:src="'js/loading.js?version='+${new java.util.Date().getTime()}"></script>
+	<script>
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		window.addEventListener("pageflowrefresh", function (e) {
+		    location.reload();
+		});
+		$$('#submit').on('tap',function(e){
+			var flag = false;
+			$$('input[required]').each(function(e){
+				if($$(this).val()==''){flag=true;return false;}
+			});
+			if(flag){
+				mui.toast('请填写分数');
+				return false;
+			}
+			var obj = $$("#frm").serializeJSON();
+			var i = $$('input:radio:checked').length;
+			var n = $$('input:radio').length/2;
+			var m = $$('input:radio:checked[value=1]').length;
+			if(n>0){
+				if(i!=n){
+					mui.toast('考核项目尚未填写是否合格');
+					return false;
+				}
+				if(obj.score==''){
+					mui.toast('未选择技能矩阵');
+					return false;
+				}
+				if(obj.score*1>2&&m!=n){
+					mui.toast('实践项目必须全部合格技能矩阵才能选3/4及以上');
+					return false;
+				}
+			}
+			mui.showLoading('正在提交...');
+			$.ajax('../exam/saveScore.do',{
+				data: obj,					
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},	              
+				success:function(data){
+					mui.hideLoading();
+					mui.toast(data.message);
+					if(data.flag){
+						window.location.replace(document.referrer);
+					}
+				},
+				error:function(xhr,type,errorThrown){
+					mui.hideLoading();
+					mui.toast('网络错误');
+				}
+			});
+		});
+	}(mui, document, jQuery));
+	</script>
+</html>

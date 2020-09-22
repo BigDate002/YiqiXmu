@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans    
+                        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd    
+                        http://www.springframework.org/schema/context    
+                        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                        http://www.springframework.org/schema/aop    
+                        http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 		
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+	<!-- 自动扫描 -->
+	<context:component-scan base-package="com.netcity.*" />
+	<!-- 引入配置文件 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:jdbc.properties" />
+	</bean>
+
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" name="dataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${driver}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="${initialSize}"></property>
+		<!-- 连接池最大数量 -->
+		<property name="maxActive" value="${maxActive}"></property>
+		<!-- 连接池最大空闲 -->
+		<property name="maxIdle" value="${maxIdle}"></property>
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="${minIdle}"></property>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="${maxWait}"></property>
+
+		<!-- 配置检查连接是否可用 -->
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- 配置监控统计拦截的filters，去掉后监控界面sql无法统计加入log4j是为了和log4f集成，如不需要可不加 <property 
+			name="filters" value="stat,log4j" /> -->
+	</bean>
+
+	<bean id="dataSource1" class="com.alibaba.druid.pool.DruidDataSource" name="dataSource1"
+		destroy-method="close">
+		<property name="driverClassName" value="${driver1}" />
+		<property name="url" value="${url1}" />
+		<property name="username" value="${username1}" />
+		<property name="password" value="${password1}" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="${initialSize1}"></property>
+		<!-- 连接池最大数量 -->
+		<property name="maxActive" value="${maxActive1}"></property>
+		<!-- 连接池最大空闲 -->
+		<!--<property name="maxIdle" value="${maxIdle}"></property> -->
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="${minIdle1}"></property>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="${maxWait1}"></property>
+		<!-- 配置检查连接是否可用 -->
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+	</bean>
+
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+		<!-- other configuration -->
+		<property name="plugins">
+			<array>
+				<bean class="com.github.pagehelper.PageInterceptor">
+					<property name="properties">
+						<!-- config params as the following -->
+						<value>
+							helperDialect=mysql
+						</value>
+					</property>
+				</bean>
+			</array>
+		</property>
+	</bean>
+	
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory1" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource1" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+	</bean>
+
+	<!-- Mapper接口所在包，Spring会自动查找其下的Mapper -->
+	<!-- <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.netcity.mapper" />
+	</bean>-->
+
+	<!-- 在会话工厂中取出SqlSessionTemplate这个对象 -->
+	<bean id="sqlsessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- 在会话工厂中取出SqlSessionTemplate这个对象 -->
+	<bean id="sqlsessionTemplate1" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory1" />
+	</bean>
+
+	<!--(事务管理) -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!--注解方式实现事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 下面使用aop切面的方式来实现 -->
+	<aop:config>
+		<!--配置事务切点 -->
+		<aop:pointcut id="services"
+			expression="execution(* com.netcity..service.*.*(..))" />
+		<aop:advisor pointcut-ref="services" advice-ref="TestAdvice" />
+	</aop:config>
+	<tx:advice id="TestAdvice" transaction-manager="transactionManager">
+		<!--配置事务传播性，隔离级别以及超时回滚等问题 -->
+		<tx:attributes>
+			<tx:method name="import*" propagation="REQUIRED" isolation="DEFAULT"
+				rollback-for="com.netcity.exception.ServiceException" />
+			<tx:method name="insert*" propagation="REQUIRED" isolation="DEFAULT"
+			rollback-for="com.netcity.exception.ServiceException" />
+			<tx:method name="save*" propagation="REQUIRED" isolation="DEFAULT"
+				rollback-for="com.netcity.exception.ServiceException" />
+			<tx:method name="create*" propagation="REQUIRED" isolation="DEFAULT"
+				rollback-for="com.netcity.exception.ServiceException" />
+			<tx:method name="delete*" propagation="REQUIRED" isolation="DEFAULT"
+				rollback-for="com.netcity.exception.ServiceException" />
+			<tx:method name="update*" propagation="REQUIRED" isolation="DEFAULT"
+				rollback-for="com.netcity.exception.ServiceException" />
+			<tx:method name="add*" propagation="REQUIRED" isolation="DEFAULT"
+				rollback-for="com.netcity.exception.ServiceException" />
+			<tx:method name="*" propagation="SUPPORTS" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- Spring中引入其他配置文件 -->
+	<!-- <import resource="classpath*:/dubbo-provider.xml" /> -->
+	
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="successUrl" value="/index.html" />
+		<property name="unauthorizedUrl" value="/403.do" />
+		<property name="filters">
+            <map>
+                <entry key="authc">
+                    <bean class="com.netcity.shiro.ShiroFormAuthenticationFilter"></bean>
+                </entry>
+            </map>
+        </property>
+		<property name="filterChainDefinitions">
+			<value>
+				/qualify/zizhi.html = anon
+				/mobile/css/** = anon
+				/mobile/fonts/** = anon
+				/mobile/images/** = anon
+				/mobile/js/** = anon
+				/mobile/libs/** = anon
+				/mobile/unpackage/** = anon
+				/mobile/login.html = anon
+				/mobile/tishi.html = anon
+				/mobile/ddlogin.html = anon
+				/mobile/login.do = anon
+				/mobile/ddlogin.do = anon
+				/login.html = anon
+				/login.do = anon
+				/logout.do = logout
+				/css/** = anon
+				/images/** = anon
+				/js/** = anon
+				/kit/** = anon
+				/lib/** = anon
+				/plugins/** = anon
+				/resources/** = anon
+				/excel/** = anon
+				/** = authc
+			</value>
+		</property>
+	</bean>
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="myShiroRealm"></property>
+		<property name="cacheManager" ref="cacheManager"></property>
+	</bean>
+	<bean id="cacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager" />
+	
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="cacheSeconds" value="0"/>
+        <property name="webBindingInitializer">
+            <bean class="com.netcity.controller.WebBinderInitializerUtils"/>
+        </property>
+    </bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="104857600" />
+	</bean>
+</beans>  

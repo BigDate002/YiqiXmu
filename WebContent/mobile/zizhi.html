@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>人员资质</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+		<link href="css/css.css" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+			.mui-popover-arrow{
+				display:none;
+			}
+		</style>
+		<script>
+			localStorage.setItem('pageLoadOk','ok');
+		</script>
+	</head>
+
+	<body>
+		<div class="mui-show-loading-mask"></div>
+		<div class="mui-show-loading loading-visible">
+			<i class="mui-spinner mui-spinner-white"></i>
+			<p class="text">正在加载...</p>
+		</div>
+		<div id="abc" style="position:fixed;top:calc(50vh - 34vw + 20px)">
+		</div>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a class="mui-icon mui-icon-search mui-pull-right mui-a-color" id="ss" style="font-size:15px;line-height:25px;">搜索</a>
+			<h1 class="mui-title">人员资质</h1><br/><br/>
+			<form id="searchFrm" class="mui-input-group" onsubmit="return aa()" style="display:none;margin-top:-1px;">
+				<div class="mui-input-row mui-select" style="height:1px;"></div>
+				<div class="mui-input-row mui-select">
+					<label>部门</label>
+					<select name="department" id="department">
+						<option value="0">请选择部门</option>
+					</select>
+				</div>
+				<div class="mui-input-row mui-select">
+					<label>科室/车间</label>
+					<select name="workShop" id="workShop">
+						<option value="0">请选择科室/车间</option>
+					</select>
+				</div>
+				<div class="mui-input-row mui-select">
+					<label>班组</label>
+					<select name="workGroup" id="workGroup">
+						<option value="0">请选择班组</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>工号或姓名</label>
+					<input type="text" id="search" placeholder="请输入工号或姓名" name="examtime" class="mui-input-clear" />
+					<a id='searchBtn' class="mui-icon mui-icon-search" style="font-size:15px;line-height:22px;position:fixed;right:10px;">查询</a>
+				</div>
+				<p style="padding-bottom:13px;"></p>
+			</form>
+		</header>
+		<div class="mui-content" style="padding-bottom:45px;">
+			<ul class="mui-table-view">
+			</ul>
+			</div>
+		</div>
+		<div id="popover" class="mui-popover" style="width: 100%">
+			<img width="100%" id="zizhi" />
+		</div>
+		<div style="position:fixed;width:100%; background:#fff; padding:8px 0; bottom:0; text-align:center;">
+			<ul id="pagination" class="mui-pagination">
+			</ul>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script th:src="'js/loading.js?version='+${new java.util.Date().getTime()}"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script src="../plugins/jquery/jquery.serializejson.js"></script>
+	<script th:src="'js/pager.js?version='+${new java.util.Date().getTime()}"></script>
+	<script>
+		mui.init({
+			swipeBack:true //启用右滑关闭功能
+		});
+		var pagehelp;
+		mui.ready(function() {
+			//mui.toast('加载完毕');
+			mui.hideLoading();
+			$('.mui-icon-clear').css('right','50px');
+			$('.mui-bar').on('tap','#ss',function(){
+				$('#searchFrm').slideToggle();
+			});
+			$('#xxx').show();
+			pagehelp = pager({
+				 url:'../qualify/queryPage.do'
+				,pageSize:50
+				,done:function(res){
+					$(document).scrollTop(0);
+					$('#searchFrm').slideUp();
+					$('.mui-table-view').html(res.data.map(function(item,index){
+						return `<li class="mui-table-view-cell mui-media">
+								<a href="javascript:;">
+									<!--<img class="mui-media-object mui-pull-left" src="../images/mu.jpg">-->
+									<div class="mui-media-body" >
+										<span>${(pagehelp.pageNum-1)*pagehelp.pageSize+index+1}${'.工号:'+item.userCode+' 姓名:'+item.username}</span>
+										<p class='mui-ellipsis mui-font4'>${'部门:'+item.department}</p>
+										<p class='mui-ellipsis mui-font4'>${'科室/车间:'+item.workShop}</p>
+										<p class='mui-ellipsis mui-font4'>${'班组:'+item.workGroup}</p>
+										<p class='mui-ellipsis mui-font4'>${'岗位:'+item.post}</p>
+										<p class='mui-ellipsis mui-font4'>${'有效期:'+item.beginDate+'到'+item.endDate}</p>
+										<button type="button" data-id=${item.id} class="mui-btn-s mui-btn-primary lookPic">查看证书</button></p>
+									</div>
+								</a>
+							</li>`;
+					}));
+					mui.hideLoading();
+				}
+			});
+			pagehelp.loadData();
+		});
+		function aa(){
+			try{
+				var query = $("#search").val().toUpperCase();
+				$('#xxx').hide();
+				setTimeout(function(){
+					$('#xxx').show();
+				},200);
+				pagehelp.loadData({grantUser:query});
+			}catch(e){
+				mui.toast('查询异常请重试!')
+				mui.hideLoading();
+			}
+			finally{
+				return false;
+			}
+		}
+		
+		$('#searchBtn').on('tap',function(e){
+			var param1 = {};
+			var workGroupId = $('#workGroup').val()*1;
+			var workShopId = $('#workShop').val()*1;
+			var departmentId = $('#department').val()*1;
+			if(workGroupId&&workGroupId>0){
+				param1.departmentId = workGroupId;
+			}else if(workShopId&&workShopId>0){
+				param1.departmentId = workShopId;
+			}else if(departmentId&&departmentId>0){
+				param1.departmentId = departmentId;
+			}
+			param1.query = $("#search").val()||'';
+			pagehelp.loadData(param1);
+		});
+		
+		$('#zizhi').load(function(){
+			//mui.toast('图片加载完毕');
+			mui.hideLoading();
+			mui('#popover').popover('show',document.getElementById("abc"));
+		});
+		mui('.mui-content').on('tap','.lookPic',function(){
+			var id = $(this).attr('data-id');
+			mui.showLoading('正在加载...');
+			$('#zizhi').attr('src','../qualify/downloadimg.do?id='+id);
+		});
+		
+		var param = {};
+		param.level = '二级';
+		mui.ajax('../department/queryClass2.do',{
+			dataType:'json',
+			data:param,
+			type:'post',
+			timeout:45000,
+			headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+			success:function(data){
+				data.data.forEach(function(e){
+					$('[name=department]').append('<option value="'+e.code+'">'+e.name+'</option>');
+				});
+			},
+			error:function(xhr,type,errorThrown){
+				mui.toast('网络错误');
+			}
+		});
+		
+		$('[name=department]').change(function(){  
+			var pid = $(this).children('option:selected').val();
+			mui.ajax('../department/queryClass2.do',{
+				dataType:'json',
+				data:{parentId:pid},
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					$('#workShop').find("option").not(":first").remove();
+					$('#workShopId').find("option").not(":first").remove();
+					data.data.forEach(function(e){
+						$('[name=workShop]').append('<option value="'+e.code+'">'+e.name+'</option>');
+					});
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});  
+		
+		$('[name=workShop]').change(function(){
+			var pid = $(this).children('option:selected').val();
+			mui.ajax('../department/queryClass2.do',{
+				dataType:'json',
+				data:{parentId:pid},
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					$('#workGroup').find("option").not(":first").remove();
+					data.data.forEach(function(e){
+						$('[name=workGroup]').append('<option value="'+e.code+'">'+e.name+'</option>');
+					});
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+	</script>
+</html>

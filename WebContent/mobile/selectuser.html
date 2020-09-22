@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>选择人员</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/css.css" rel="stylesheet" />
+		<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a class="mui-icon mui-icon-search mui-pull-right mui-a-color" id="ss" style="font-size:15px;line-height:25px;">搜索</a>
+			<h1 class="mui-title" id="abc">选择人员</h1><br/><br/>
+			<form id="searchFrm" class="mui-input-group" onsubmit="return aa()" style="display:none;background:white;margin-top:-1px;">
+				<div class="mui-input-row mui-select" style="height:1px;"></div>
+				<div class="mui-input-row mui-select">
+					<label>部门</label>
+					<select name="department" id="department">
+						<option value="0">请选择部门</option>
+					</select>
+				</div>
+				<div class="mui-input-row mui-select">
+					<label>科室/车间</label>
+					<select name="workShop" id="workShop">
+						<option value="0">请选择科室/车间</option>
+					</select>
+				</div>
+				<div class="mui-input-row mui-select">
+					<label>班组</label>
+					<select name="workGroup" id="workGroup">
+						<option value="0">请选择班组</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>工号或姓名</label>
+					<input type="text" id="search" placeholder="请输入工号或姓名" name="examtime" class="mui-input-clear" />
+					<a id='searchBtn' class="mui-icon mui-icon-search" style="font-size:15px;line-height:25px;position:fixed;right:10px;">查询</a>
+				</div>
+			</form>
+			<div style="background:white;">
+			<a id='submit' class="mui-btn mui-btn-primary">确定</a>
+			<a id="checkall" class="mui-btn mui-btn-primary">全选</a>
+			<a id="uncheckall" class="mui-btn mui-btn-primary">取消全选</a>
+			<a id="removeall" class="mui-btn mui-btn-primary">清空已选</a>
+			<p style="padding-bottom:13px;"></p>
+			</div>
+		</header>
+		<div class="mui-content mui-scroll-wrapperrr" style="margin-top:50px;">
+			 <div class="mui-scroll" id="userlist">
+			 </div>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script src="../plugins/jquery/jquery.serializejson.js"></script>
+	<script th:src="'js/loading.js?version='+${new java.util.Date().getTime()}"></script>
+	<script th:inline="javascript">
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:false
+		});
+		$.ready(function() {
+			$$("#search").siblings('.mui-icon-clear').css('right','50px');
+			$('.mui-bar').on('tap','#ss',function(){
+				$$('#searchFrm').slideToggle();
+			});
+			var param = {};
+			param.level = '二级';
+			$.ajax('../department/queryClass2.do',{
+				dataType:'json',
+				data:param,
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					data.data.forEach(function(e){
+						$$('[name=department]').append('<option value="'+e.code+'">'+e.name+'</option>');
+					});
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+			
+			$$('[name=department]').change(function(){  
+				var pid = $$(this).children('option:selected').val();
+				$.ajax('../department/queryClass2.do',{
+					dataType:'json',
+					data:{parentId:pid},
+					type:'post',
+					timeout:45000,
+					headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+					success:function(data){
+						$$('#workShop').find("option").not(":first").remove();
+						$$('#workShopId').find("option").not(":first").remove();
+						data.data.forEach(function(e){
+							$$('[name=workShop]').append('<option value="'+e.code+'">'+e.name+'</option>');
+						});
+					},
+					error:function(xhr,type,errorThrown){
+						mui.toast('网络错误');
+					}
+				});
+			});  
+			
+			$$('[name=workShop]').change(function(){
+				var pid = $$(this).children('option:selected').val();
+				$.ajax('../department/queryClass2.do',{
+					dataType:'json',
+					data:{parentId:pid},
+					type:'post',
+					timeout:45000,
+					headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+					success:function(data){
+						$$('#workGroup').find("option").not(":first").remove();
+						data.data.forEach(function(e){
+							$$('[name=workGroup]').append('<option value="'+e.code+'">'+e.name+'</option>');
+						});
+					},
+					error:function(xhr,type,errorThrown){
+						mui.toast('网络错误');
+					}
+				});
+			});
+			
+			var id = [[${param.id}]];
+			var dept = 1*[[${param.departmentId}]];
+			var list = [];
+			$$('#checkall').on('tap',function(e){
+				$$('input:checkbox[name=ids]:visible').prop('checked',true);
+				e.stopPropagation();
+			});
+			$$('#uncheckall').on('tap',function(e){
+				$$('input:checkbox[name=ids]').removeAttr('checked');
+				e.stopPropagation();
+			});
+			
+			$$('#removeall').on('tap',function(e){
+				$$('input:checkbox[name=ids]').removeAttr('checked');
+				parent.persons = [];
+				e.stopPropagation();
+			});
+			
+			$$('#submit').on('tap',function(e){
+				var arr = new Array();
+				$$('input:checkbox[name=ids]:checked').each(function(i){
+					var id = $$(this).val();
+					var obj = list.find(function(el){return el.id==id;});
+					arr.push(obj);
+				});
+				var myEvent = new CustomEvent('showuser',{
+					detail:{
+						id:id,
+						data:arr
+					}
+				});
+				if(window.parent.dispatchEvent) {  
+				    window.parent.dispatchEvent(myEvent);
+				} else {
+				    window.parent.fireEvent(myEvent);
+				}
+				e.stopPropagation();
+				e.preventDefault();
+				return false;
+			});
+			
+			$$('#searchBtn').on('tap',function(e){
+				loadData();
+			});
+			window.loadData = function(){
+				mui.showLoading('加载中...');
+				var param = {};
+				var workGroupId = $$('#workGroup').val()*1;
+				var workShopId = $$('#workShop').val()*1;
+				var departmentId = $$('#department').val()*1;
+				if(workGroupId&&workGroupId>0){
+					param.departmentId = workGroupId;
+				}else if(workShopId&&workShopId>0){
+					param.departmentId = workShopId;
+				}else if(departmentId&&departmentId>0){
+					param.departmentId = departmentId;
+				}
+				param.query = $$("#search").val()||'';
+				$.ajax('../train/queryUserbypostion.do',{
+					data:param,
+					dataType:'json',
+					type:'post',
+					timeout:45000,
+					headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+					success:function(data){
+						$$('#searchFrm').slideUp();
+						mui.hideLoading();
+						list = data.data;
+						$$('#userlist').html('<table>');
+						$$('#userlist').append('<tr class="li-head" style="font-weight:bolder;"><td style="font-size:12px;">部门&nbsp;&nbsp;&nbsp;</td><td style="font-size:12px;">科室/车间&nbsp;&nbsp;</td><td style="font-size:12px;">班组</td><td style="font-size:12px;">工号</td><td style="font-size:12px;">姓名</td><td style="font-size:12px;">选择</td></tr>');
+						data.data.forEach(function(e){
+							$$('#userlist').append('<tr class="li" data-department="'+e.department+'" data-workShop="'+e.workShop+'" data-workGroup="'+e.dept+'" data-name="'+e.name+'" data-id="'+e.usercode+'" class="mui-input-row mui-checkbox"><td style="font-size:12px;">'+e.department+'&nbsp;&nbsp;&nbsp;</td><td style="font-size:12px;">'+e.workShop+'&nbsp;&nbsp;</td><td style="font-size:12px;">'+e.dept+'&nbsp;&nbsp;</td><td style="font-size:12px;">'+e.usercode+'&nbsp;&nbsp;</td><td style="font-size:12px;">'+e.name+'</td>'
+									+'<td align="center"><input '
+									+(parent.persons.findIndex(function(obj){
+										return obj.usercode===e.usercode
+									})>-1?'checked=checked':'')
+									+' type="checkbox" name="ids" value = "'+e.id+'"/></td></tr>');
+						});
+						$$('#userlist').append('</table>');
+					},
+					error:function(xhr,type,errorThrown){
+						mui.toast('网络错误');
+					}
+				});
+			}
+			
+			loadData();
+		});
+	}(mui, document, jQuery));
+	function aa(){
+		/* var query = $("#search").val().toUpperCase();
+		if(query==''){
+			$('.li').show();
+		}else{
+			$('.li').hide();
+			$("[data-name*="+query+"],[data-id*="+query+"],[data-department*="+query+"],[data-workShop*="+query+"],[data-workGroup*="+query+"]").show();
+		} */
+		return false;
+	}
+	</script>
+</html>

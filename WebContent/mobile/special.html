@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>新申领</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<link href="css/mui.min.css" rel="stylesheet" />
+	<link href="css/css.css" rel="stylesheet" />
+	<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+	<link href="css/mui.picker.min.css" rel="stylesheet" />
+	<style>
+
+		.mbar{
+			overflow: hidden;
+			background: #fff;
+			padding: 15px;
+			padding-bottom: 0;
+			text-align:center;
+		}
+		.mbar button {
+			/* 	float: left; */
+			width: 48%;
+			height: 36px;
+			/* 	margin: 0 5%; */
+		}
+		.mbar_fl{
+			float: left;
+		}
+		.mbar_fr{
+			float: right;
+		}
+		.mui-table-view:before {
+			height: 0;
+		}
+		#frm2 .datepicker{
+			opacity: 0;
+			width: 65%;
+		}
+		button.datepicker {
+			width: 65%!important;
+			opacity: 0;
+		}
+		.mui-table-view-cell:after {
+			right: 15px;
+		}
+		.mui-input-group .mui-input-row:after {
+			right: 15px;
+		}
+		a.xzr {
+			right: 15px!important;
+		}
+		.mui-input-group .mui-input-row {
+			height: auto!important;
+		}
+		div#course {
+			position: initial;
+		}
+		.mui-input-row label {
+			padding: 20px !important;
+		}
+		.mui-input-row select {
+			display: block;
+			margin-bottom: 5px!important;
+		}
+		.mui-input-group .mui-input-row {
+			height: auto!important;
+		}
+
+	</style>
+	<script>
+		localStorage.setItem('pageLoadOk','ok');
+	</script>
+</head>
+
+<body>
+<div id="abc" style="position:fixed;top:45px;">
+</div>
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<a class="mui-icon mui-icon-search mui-pull-right mui-a-color" id="ss" style="font-size:15px;line-height:25px;">搜索</a>
+	<h1 class="mui-title" id="abc">特种工证件</h1><br/><br/>
+	<form id="searchFrm" class="mui-input-group" onsubmit="return aa()" style="display:none;background:#ffffff;margin-top:-1px;">
+		<hr style="color:white;line-height:5px;">
+		<div class="mui-input-row mui-select">
+			<label>业务类型</label>
+			<select name="type" id="type">
+				<option value=>请选择业务类型</option>
+				<option value="0">新申领</option>
+				<option value="1">复审</option>
+			</select>
+		</div>
+		<div class="mui-input-row">
+			<label>证书名称</label>
+			<input type="text" id="search" placeholder="请输证书名称" name="certificateName" class="mui-input-clear" />
+			<a id='searchBtn' class="mui-icon mui-icon-search" style="font-size:15px;line-height:25px;position:fixed;right:10px;">查询</a>
+		</div>
+	</form>
+</header>
+<div class="mui-content" style="padding-bottom:45px;">
+	<div class="mbar">
+		<button id='btn1' class="mui-btn-blue mbar_fl">新申领</button>
+		<button id='btn2' class="mui-btn-blue mbar_fr">待复审</button>
+	</div>
+	<ul class="mui-table-view">
+
+	</ul>
+	<div id="popover" class="mui-popover" data-disable-auto-close="true" style="width: 100%">
+		<form class="mui-input-group" id="frm1">
+			<div class="mui-input-row">
+				<label>部门</label>
+				<select disabled>
+					<option value="0"><span th:text="${user.department}"></span></option>
+				</select>
+			</div>
+			<div class="mui-input-row">
+				<label>科室/车间</label>
+				<select disabled>
+					<option value="0"><span th:text="${user.workShop}"></span></option>
+				</select>
+			</div>
+			<div class="mui-input-row">
+				<label>班组</label>
+				<select disabled>
+					<option value="0"><span th:text="${user.dept}"></span></option>
+				</select>
+			</div>
+
+			<div class="mui-input-row">
+				<label>证件名称</label>
+				<input type="text" id="certificateName" placeholder="请输证件名称" name="certificateName" class="mui-input-clear" />
+			</div>
+			<div class="mui-input-row">
+				<label>办理机构</label>
+				<select id="handlingAgency" required name="handlingAgency" >
+					<option value>请选择</option>
+					<option value="0" >公司办理</option>
+					<option value="1" >个人办理</option>
+				</select>
+			</div>
+
+			<div class="mui-input-row">
+				<label>身份证正面</label>
+				<input type="file" id="frontOfIDCardUpload" accept="image/*" required>
+				<input type="hidden" id="frontOfIDCard" name="frontOfIDCard">
+				<input type="hidden" id="frontOfIDCardName" name="frontOfIDCardName">
+			</div>
+			<div class="mui-input-row">
+				<label>身份证反面</label>
+				<input type="file" id="reverseSideOfIDCardUpload" accept="image/*">
+				<input type="hidden" id="reverseSideOfIDCard" name="reverseSideOfIDCard">
+				<input type="hidden" id="reverseSideOfIDCardName" name="reverseSideOfIDCardName">
+			</div>
+			<div class="mui-input-row">
+				<label>学历证明</label>
+				<input type="file" id="educationCertificateUpload" accept="image/*">
+				<input type="hidden" id="educationCertificate" name="educationCertificate">
+				<input type="hidden" id="educationCertificateName" name="educationCertificateName">
+			</div>
+			<div class="mui-input-row">
+				<label>其它材料</label>
+				<input type="file" id="otherMaterialsUpload" accept="image/*">
+				<input type="hidden" id="otherMaterials" name="otherMaterials">
+				<input type="hidden" id="otherMaterialsName" name="otherMaterialsName">
+			</div>
+			<input type="hidden" name="type" value="0">
+			<input type="hidden" name="status" value="0">
+			<div class="mui-button-row mbar mui-h67">
+				<button type="button" id="btnOk" class="mui-btn mui-btn-blue mbar_fl">确认</button>
+				<button type="button" id="btnCancle" class="mui-btn mui-btn-white mbar_fr">取消</button>
+			</div>
+		</form>
+	</div>
+
+
+	<div id="popover2" class="mui-popover" data-disable-auto-close="true" style="width: 100%">
+		<form class="mui-input-group" id="frm3">
+			<div class="mui-input-row">
+				<label>部门</label>
+				<select disabled>
+					<option value="0"><span th:text="${user.department}"></span></option>
+				</select>
+			</div>
+			<div class="mui-input-row">
+				<label>科室/车间</label>
+				<select disabled>
+					<option value="0"><span th:text="${user.workShop}"></span></option>
+				</select>
+			</div>
+			<div class="mui-input-row">
+				<label>班组</label>
+				<select disabled>
+					<option value="0"><span th:text="${user.dept}"></span></option>
+				</select>
+			</div>
+
+			<div class="mui-input-row">
+				<label>证件名称</label>
+				<input type="text" disabled placeholder="请输证件名称" name="certificateName" class="mui-input-clear" />
+			</div>
+			<div class="mui-input-row">
+				<label>办理机构</label>
+				<select id="handlingAgency" disabled required name="handlingAgency" >
+					<option value>请选择</option>
+					<option value="0" >公司办理</option>
+					<option value="1" >个人办理</option>
+				</select>
+			</div>
+
+			<div class="mui-input-row">
+				<label>身份证正面</label>
+				<input type="file" id="frontOfIDCardUpload" accept="image/*" required>
+
+				<div id="frontOfIDCardUploadImg"></div>
+
+				<input type="hidden" id="frontOfIDCard" name="frontOfIDCard">
+				<input type="hidden" id="frontOfIDCardName" name="frontOfIDCardName">
+			</div>
+			<div class="mui-input-row">
+				<label>身份证反面</label>
+				<input type="file" id="reverseSideOfIDCardUpload" accept="image/*">
+				<div id="reverseSideOfIDCardUploadImg"></div>
+
+				<input type="hidden" id="reverseSideOfIDCard" name="reverseSideOfIDCard">
+				<input type="hidden" id="reverseSideOfIDCardName" name="reverseSideOfIDCardName">
+			</div>
+			<div class="mui-input-row">
+				<label>学历证明</label>
+				<input type="file" id="educationCertificateUpload" accept="image/*">
+				<div id="educationCertificateUploadImg"></div>
+
+				<input type="hidden" id="educationCertificate" name="educationCertificate">
+				<input type="hidden" id="educationCertificateName" name="educationCertificateName">
+			</div>
+			<div class="mui-input-row">
+				<label>其它材料</label>
+				<input type="file" id="otherMaterialsUpload" accept="image/*">
+				<div id="otherMaterialsUploadImg"></div>
+				<input type="hidden" id="otherMaterials" name="otherMaterials">
+				<input type="hidden" id="otherMaterialsName" name="otherMaterialsName">
+			</div>
+			<input type="hidden" name="type" value="0">
+			<input type="hidden" name="status" value="0">
+			<div class="mui-button-row mbar mui-h67">
+				<button type="button" id="btnOk" class="mui-btn mui-btn-blue mbar_fl">确认</button>
+				<button type="button" id="btnCancle1" class="mui-btn mui-btn-white mbar_fr">取消</button>
+			</div>
+		</form>
+	</div>
+	<div id="popover3" class="mui-popover" data-disable-auto-close="true" style="width: 100%">
+		<form class="mui-input-group" onsubmit="return aa()">
+			<div class="mui-input-row mui-search">
+				<input id="search1" style="-webkit-user-select: auto;" name="search" type="search" class="mui-input-clear" placeholder="请输入工号或姓名">
+			</div>
+		</form>
+		<div class="mui-button-row">
+			<button type="button" id="btnYes1" class="mui-btn mui-btn-primary" style="width:49%;">确认</button>
+			<button type="button" id="btnQuxiao1" class="mui-btn mui-btn-primary" style="width:49%;">取消</button>
+		</div>
+		<div id="zzz" style="overflow:scroll;">
+			<table id="zhidao">
+			</table>
+		</div>
+	</div>
+</div>
+<div style="position:fixed;width:100%; background:#fff; padding:8px 0; bottom:0; text-align:center;">
+	<ul id="pagination" class="mui-pagination">
+	</ul>
+</div>
+<iframe style="display: none;position: absolute; top: 0px;" id="checkuser" frameborder="0" width="100%" height="100%"></iframe>
+</body>
+<script src="js/mui.min.js"></script>
+<script src="js/mui.picker.min.js"></script>
+<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+<script src="../plugins/jquery/jquery.serializejson.js"></script>
+<script th:src="'js/loading.js?version='+${new java.util.Date().getTime()}"></script>
+<script th:src="'js/pager.js?version='+${new java.util.Date().getTime()}"></script>
+<script>
+
+	$("#frontOfIDCardUpload").on("change",function(){
+		upload(this,'frontOfIDCard');
+	});
+	$("#reverseSideOfIDCardUpload").on("change",function(){
+		upload(this,'reverseSideOfIDCard');
+	});
+	$("#educationCertificateUpload").on("change",function(){
+		upload(this,'educationCertificate');
+	});
+	$("#otherMaterialsUpload").on("change",function(){
+		upload(this,'otherMaterials');
+	});
+	function upload(obj,inputId) {
+		var file = obj.files[0];
+		var data = new FormData();
+		data.append("filename", file);
+		$.ajax({
+			type: "post",
+			url: "../specialCertificates/upload.do",
+			data: data,
+			contentType: false,
+			//默认文件类型application/x-www-form-urlencoded  设置之后multipart/form-data
+			processData: false,
+			// 默认情况下会对发送的数据转化为对象 不需要转化的信息
+			success: function (res) {
+				$("#"+inputId).val(res.msg);
+				$("#"+inputId+"Name").val(res.message);
+			},
+		});
+	}
+
+	function resetUpload() {
+		$("#frontOfIDCard").val('');
+		$("#frontOfIDCardName").val('');
+		$("#reverseSideOfIDCard").val('');
+		$("#reverseSideOfIDCardName").val('');
+		$("#educationCertificate").val('');
+		$("#educationCertificateName").val('');
+		$("#otherMaterials").val('');
+		$("#otherMaterialsName").val('');
+	}
+
+	var persons = [];
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		var abcd;
+		var target;
+		$.ready(function(){
+			$('.mui-bar').on('tap','#ss',function(){
+				$$('#hidediv').css('height','1px');
+				$$('#searchFrm').slideToggle();
+			});
+			$$('.mui-icon-clear').css('right','50px');
+			var scroll = $(".mui-scroll-wrapper").scroll();
+
+			$$('#searchBtn').on('tap',function(e){
+
+				var type = $$('#type').val()*1;
+				var param1 = {};
+
+				param1.certificateName = $$("#search").val()||'';
+				param1.type = type;
+				pagehelp.param = param1;
+
+				pagehelp.loadData();
+			});
+		});
+
+		$('.mbar').on('tap','#btn1',function(){
+			// _departmentId = 0;
+			$$('#workShop').find("option").not(":first").remove();
+			$$('#workShopId').find("option").not(":first").remove();
+			$$('#workGroup').find("option").not(":first").remove();
+			$$('#postionId').find("option").not(":first").remove();
+			frm1.reset();
+			persons = [];
+			$('#popover').scroll().scrollTo(0,0);
+			$('#popover').popover('show',doc.getElementById("btn1"));
+			abcd = 'popover';
+		});
+
+
+		$('.mbar').on('tap','#btn2',function(){
+
+
+			pagehelp.loadData({type:1});
+
+
+		});
+		$$('#btnCancle').on('tap',function(){
+			$('#popover').popover('hide');
+		});
+		$$('#btnCancle1').on('tap',function(){
+			$$('#frontOfIDCardUploadImg').empty();
+			$$('#reverseSideOfIDCardUploadImg').empty();
+			$$('#educationCertificateUploadImg').empty();
+			$$('#otherMaterialsUploadImg').empty();
+			$('#popover2').popover('hide');
+		});
+		$$('#btnQuxiao').on('tap',function(){
+			$('#popover1').popover('hide');
+		});
+		$$('#btnQuxiao1').on('tap',function(){
+			$('#popover3').popover('hide');
+			if(abcd=='popover'){
+				$('#popover').popover('show',doc.getElementById("btn1"));
+			}else{
+				$('#popover2').popover('show',doc.getElementById("btn2"));
+			}
+		});
+		var pagehelp = pager({
+			url:'../specialCertificates/newClaim/queryPage.do'
+			,pageSize:50
+			,done:function(res){
+				$$(doc).scrollTop(0);
+				$$('#searchFrm').slideUp();
+				$$('.mui-table-view').html(res.data.map(function(item,index){
+
+					var status = "";
+					if (item.status == '0'){
+						status = "初审中";
+					}else if (item.status == '1'){
+						status = "待复审";
+					}else if (item.status == '2'){
+						status = "正常";
+					}else if (item.status == '3'){
+						status = "过期";
+					}else if (item.status == '4'){
+						status = "待换证";
+					}
+
+					var oper = item.type!=1?'':`<p><button type="button" data-id=${item.id} class="mui-btn mui-btn-primary reviewBtn" >复审</button>`;
+					return `<li class="mui-table-view-cell">
+								<span>${(pagehelp.pageNum-1)*pagehelp.pageSize+index+1}${'.证书名称:'+item.certificateName}</span>
+								<br/>
+								${item.certificateNumber ? ('<span>证书编号:' + item.certificateNumber + '</span><br/>') : ''}
+
+								${'办理机构:'+(item.handlingAgency=='1'?'公司办理':'个人办理')}
+								<br/>
+								${'证书状态:' + status}
+								<br/>
+								<p class='mui-ellipsis'>${'提报时间:'+item.reportingTime}</p>
+
+								${oper}
+							</li>`;
+				}));
+
+
+				$$('.reviewBtn').on('tap',function(e){
+					var id = $$(this).attr('data-id');
+					var url = '../specialCertificates/newClaim/queryById.do?requestTime='+new Date().getTime();
+					$.ajax(url,{
+						data:JSON.stringify({id:id}),
+						dataType:'json',
+						type:'post',
+						timeout:45000,
+						headers:{'Content-Type':'application/json'},
+						success:function(data){
+							if(data.flag){
+								var a = data.data;
+								var frm = $$('#frm3');
+								var name = "certificateName";
+								SetInputValue(frm, name, a.certificateName);
+								SetSelectValue(frm, 'handlingAgency', a.handlingAgency);
+
+								// 图片赋值
+								a.files.forEach(function (value) {
+									var htm = '<img style="width:150px;height: 100px;" src="../specialCertificates/downloadimg.do?path='+ value.url+'" />';
+									if (value.fileType === 0){
+										$$('#frontOfIDCardUploadImg').append(htm);
+									}else if (value.fileType === 1){
+										$$('#reverseSideOfIDCardUploadImg').append(htm);
+									}else if (value.fileType === 2){
+										$$('#educationCertificateUploadImg').append(htm);
+									}else if (value.fileType === 3){
+										$$('#otherMaterialsUploadImg').append(htm);
+									}
+								});
+
+
+							}
+						}
+					});
+
+
+
+					$$('#workShop').find("option").not(":first").remove();
+					$$('#workShopId').find("option").not(":first").remove();
+					$$('#workGroup').find("option").not(":first").remove();
+					$$('#postionId').find("option").not(":first").remove();
+					frm3.reset();
+					persons = [];
+					$('#popover2').scroll().scrollTo(0,0);
+					$('#popover2').popover('show',doc.getElementById("btn2"));
+					abcd = 'popover2';
+				});
+
+				$$('.stopBtn').on('tap',function(e){
+					var id = $$(this).attr('data-id');
+					frm2.reset();
+					$$('#id').val(id);
+					$('#popover1').popover('show',doc.getElementById("abc"));
+				});
+				mui.hideLoading();
+			}
+		});
+		pagehelp.loadData();
+		var btnyes = function(e){
+			$$('#btnYes').one('tap',btnyes);
+			$$('#btnYes').attr('disabled','disabled');
+			var data = $$('#frm2').serializeJSON();
+			$.ajax('../train/stop.do?requestTime='+new Date().getTime(),{
+				data: data,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},
+				success:function(data){
+					$$('#btnYes').removeAttr("disabled");
+					mui.toast(data.message);
+					if(data.flag){
+						$('#popover1').popover('hide');
+						pagehelp.loadData();
+					}
+				},
+				error:function(xhr,type,errorThrown){
+					$$('#btnYes').removeAttr("disabled");
+					mui.toast('网络错误');
+				}
+			});
+		};
+		$$('#btnYes').one('tap',btnyes);
+
+		var postMethod  = function(url,id){
+			mui.showLoading('正在提交...');
+			$.ajax(url,{
+				data:JSON.stringify({id:id}),
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},
+				success:function(data){
+					mui.hideLoading();
+					mui.toast(data.message);
+					if(data.flag){
+						pagehelp.loadData();
+					}
+				},
+				error:function(xhr,type,errorThrown){
+					mui.hideLoading();
+					mui.toast('网络错误');
+				}
+			});
+		};
+
+		$$('#btnOk').on('tap',function(){
+			var obj = $$('#frm1').serializeJSON();
+
+			if(obj.certificateName==''){
+				mui.toast('请填写证件名称!')
+				return false;
+			}
+			if(obj.handlingAgency==''){
+				mui.toast('请选择办理机构!')
+				return false;
+			}
+			if(obj.frontOfIDCard==''){
+				mui.toast('请上传身份证正面!')
+				return false;
+			}
+			if(obj.reverseSideOfIDCard==''){
+				mui.toast('请上传身份证反面!')
+				return false;
+			}
+			mui.showLoading('正在提交...');
+			$$('#btnOk').attr('disabled','disabled');
+			$.ajax('../specialCertificates/mobileCreate.do?requestTime='+new Date().getTime(),{
+				data: obj,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},
+				success:function(data){
+					mui.hideLoading();
+					resetUpload();
+					document.getElementById("frm1").reset();
+					$$('#btnOk').removeAttr("disabled");
+					mui.toast(data.message);
+					if(data.flag){
+						$('#popover').popover('hide');
+						pagehelp.loadData();
+					}
+				},
+				error:function(xhr,type,errorThrown){
+					$$('#btnOk').removeAttr("disabled");
+					mui.toast('网络错误');
+				}
+			});
+		});
+
+
+
+		$$('.datepicker').on('tap',function(e){
+			var el = $$(this).siblings('input');
+			var dtpicker = new mui.DtPicker({
+				type: 'date'
+			})
+			dtpicker.show(function(e) {
+				el.val(e.text);
+				dtpicker.dispose();
+			})
+		});
+
+
+		window.addEventListener("pageflowrefresh", function (e) {
+			pagehelp.loadData();
+		});
+
+		window.addEventListener("showuser", function (param) {
+			$$('#btn1').focus();
+			var height2 = $$('#popover2').height();
+			var height = $$('#popover').height();
+			param.detail.data.forEach(function(item){
+				if(persons.findIndex(function(obj){
+					return obj.usercode===item.usercode;
+				})<0){
+					persons.push(item);
+				}
+			});
+			$$('#'+param.detail.id).html('<label style="font-size:10px;width:auto;padding-left:130px;line-height: 18px;">'+
+					persons.map(x=>x.name).join()+'</label>');
+			checkuser.style.display = "none";
+			$$('#popover2').height(height2);
+			$$('#popover').height(height);
+			$('#popover2').scroll();
+			$('#popover').scroll();
+		});
+		$$('.xzr').on('tap',function(){
+			var id = $$(this).attr('targe');
+			var url = 'selectuser.html?id='+id+'&departmentId='+_departmentId;
+			checkuser.src = url;
+			checkuser.style.display = "block";
+			checkuser.style.zIndex = 9999;
+			//$('#popoverr').popover('show',doc.getElementById("btn1"));
+		});
+		$$('.aaaa').on('tap',function(obj){
+			$$(':radio:checked').removeAttr("checked");
+			target = $$(this).siblings('select');
+			$('#'+abcd).popover('hide');
+			$('#zzz').scroll().scrollTo(0,0);
+			$('#popover3').popover('show',doc.getElementById("btn1"));
+		});
+		$$('#btnYes1').on('tap',function(e){
+			var val = $$(':radio:checked').val();
+			if(val===undefined||val==''){
+				$.toast('请选择！')
+				return;
+			}
+			target.val(val);
+			$('#popover3').popover('hide');
+			if(abcd=='popover'){
+				$('#popover').popover('show',doc.getElementById("btn1"));
+			}else{
+				$('#popover2').popover('show',doc.getElementById("btn2"));
+			}
+		});
+
+
+	}(mui, document, jQuery));
+
+	function aa(){
+		var query = $("#search1").val().toUpperCase();
+		if(query==''){
+			$('.li').show();
+		}else{
+			$('.li').hide();
+			$("[data-name*="+query+"],[data-id*="+query+"]").show();
+		}
+		return false;
+	}
+
+	function SetInputValue(frm, Name, Value) {
+		var txt = frm.find("input[name=\"" + Name + "\"]");
+		txt.val(Value);
+		//txt[0].value = vallue;
+	}
+	function SetSelectValue(frm, Name, Value) {
+		var txt = frm.find("select[name=\"" + Name + "\"]");
+		txt.val(Value);
+		//txt[0].value = vallue;
+	}
+
+	function SetInputEmpty(frm, Names) {
+		var Arr = Names.split(",");
+		for (var i = 0; i < Arr.length; i++) {
+			var name = Arr[i];
+			var txt = frm.find("input[name=\"" + name + "\"]");
+			txt.val("");
+		}
+	}
+</script>
+</html>

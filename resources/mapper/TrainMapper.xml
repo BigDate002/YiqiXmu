@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Train">
+	<resultMap type="com.netcity.module.entity.TrainEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="beginDate" property="beginDate" />
+		<result column="endDate" property="endDate" />
+		<result column="state" property="state" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<result column="postionId" property="postionId" />
+		<result column="state1" property="state1" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_train
+	</sql>
+	<sql id="BASE_COLUMNS">
+		id,
+		beginDate,
+		endDate,
+		state,
+		createUser,
+		createDate,
+		postionId,
+		type,
+		state1
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="beginDate!=null ">
+				and a.beginDate = #{beginDate}
+			</if>
+			<if test="endDate!=null ">
+				and a.endDate = #{endDate}
+			</if>
+			<if test="state!=null ">
+				and a.state = #{state}
+			</if>
+			<!-- <if test="roleId !=null ">
+				and c.deptId in (select ff.deptId from ex_user_department ff where ff.roleId=#{roleId})
+			</if> -->
+			<if test="createUser!=null and createUser !=''">
+				and b.usercode like concat('%',#{createUser},'%')
+			</if>
+			<if test="postionId!=null ">
+				and a.postionId = #{postionId}
+			</if>
+			<if test="createDate!=null ">
+				and a.createDate = #{createDate}
+			</if>
+			<if test="usercode !=null and usercode !=''">
+				and b.usercode like concat('%',#{usercode},'%')
+			</if>
+			<if test="courseName!=null and courseName!=''">
+				and c.courseName like concat('%',#{courseName},'%')
+			</if>
+			<if test="position !=null and position !=''">
+				and d.position = #{position}
+			</if>
+			<if test="departmentId!=null">
+				and (d.workGroupId=#{departmentId} or d.workShopId=#{departmentId} or d.departmentId=#{departmentId})
+			</if>
+			<if test="query!=null and query !=''">
+				and (b.userName like concat('%',#{query},'%') or g.usercode like concat('%',#{query},'%'))
+			</if>
+			<if test="state1!=null ">
+				and a.state1 = #{state1}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.TrainEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include> a
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.TrainEntity" parameterType="com.netcity.module.entity.TrainEntity">
+		select
+     	 a.id
+		,a.beginDate
+		,a.endDate
+		,a.state
+		,a.createUser
+		,a.createDate
+		,a.type
+		,a.postionId
+		,a.studyState
+    	,d.position
+		,d.workShop
+		,d.department
+		,d.workGroup
+	    ,c.courseName
+	    ,b.username
+		from
+		ex_train a
+		join view_trainuser b on a.id=b.id
+	    left join view_course c on a.id=c.id
+	    <if test="roleId != null">
+			join ex_user_department ff ON ff.roleId = #{roleId} AND c.deptId = ff.deptId
+	    </if>
+	    left join view_position d on a.postionId=d.id
+	    <include refid="WHERE_CLAUSE"></include>
+		order by a.id desc
+	</select>
+	<select id="selectByEntity1" resultType="com.netcity.module.entity.TrainEntity" parameterType="com.netcity.module.entity.TrainEntity">
+		select
+     	 a.id
+		,a.beginDate
+		,a.endDate
+		,a.state
+		,a.createUser
+		,a.createDate
+		,a.type
+		,a.postionId
+    	,d.position
+		,d.workShop
+		,d.department
+		,d.workGroup
+	    ,c.courseName
+	    ,b.username
+	    ,a.state1
+	    ,c.ucode1
+	    ,c.name1
+	    ,c.begintime
+	    ,c.endtime
+		from
+		ex_train a
+		join view_trainuser b on a.id=b.id
+	    <!-- left join view_course c on a.id=c.id -->
+	    left join view_course1 c on a.id=c.id
+	    <if test="roleId != null">
+			join ex_user_department ff ON ff.roleId = #{roleId} AND c.deptId = ff.deptId
+	    </if>
+	    left join view_position d on a.postionId=d.id
+	    <include refid="WHERE_CLAUSE"></include>
+		order by a.id desc
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.TrainEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.TrainEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="beginDate !=null">
+				beginDate=#{beginDate},
+			</if>
+			<if test="endDate !=null">
+				endDate=#{endDate},
+			</if>
+			<if test="state !=null">
+				state=#{state},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+			<if test="updateUser !=null">
+				updateUser=#{updateUser},
+			</if>
+			<if test="state1 !=null">
+				state1=#{state1},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.TrainEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			beginDate,
+			endDate,
+			state,
+			createUser,
+			createDate,
+			postionId,
+			type
+		)
+		values (
+			#{beginDate},
+			#{endDate},
+			1,
+			#{createUser},
+			now(),
+			#{postionId},
+			#{type}
+		)
+	</insert>
+
+	<select id="queryUserbypostion" resultType="com.netcity.module.entity.UserEntity" parameterType="com.netcity.module.entity.TrainEntity">
+		select
+		 a.id
+		,a.name
+		,a.usercode
+		,case c.level when '三级' then c.name else b.name end workShop
+		,case d.level when '二级' then d.name else c.name end as department
+		,case b.level when '四级' then b.name else '——' end as dept
+		from ex_user a
+		join ex_department b on a.deptId=b.code
+		join ex_department c on b.parentId=c.code
+		join ex_department d on c.parentId=d.code
+		<where>
+			<if test="query!=null and query !=''">
+				and (a.name like concat('%',#{query},'%') or a.usercode like concat('%',#{query},'%'))
+			</if>
+			<if test="departmentId!=null">
+				and (b.code=#{departmentId} or c.code=#{departmentId} or d.code=#{departmentId})
+			</if>
+			and exists(select 1 from ex_user_department f where f.roleId=#{roleId} and f.deptId=a.deptId)
+			<!-- <if test="id !=null"> and not exists(select 1 from ex_train_user c join ex_train_position b on b.trainId=c.refid and b.positionId = #{id} join
+				ex_train d on d.id=c.refid and d.state=1 where a.usercode=c.usercode) </if> <if test="query!=null and query!=''"> and (a.name like '%${query}%' or a.usercode
+				like '%{query}%') </if> -->
+		</where>
+	</select>
+
+	<select id="selectPageCount" resultType="java.lang.Long" parameterType="com.netcity.module.entity.TrainEntity">
+		select count(*) as num
+		from
+		ex_train a
+	    join view_course c on a.id=c.id
+	    join ex_user_department ff ON ff.roleId = #{roleId} AND c.deptId = ff.deptId
+	    left join view_position d on a.postionId=d.id
+	    <include refid="WHERE_CLAUSE"></include>
+	</select>
+
+	<select id="selectPage" resultType="com.netcity.module.entity.TrainEntity" parameterType="com.netcity.module.entity.TrainEntity">
+		select a.*,b.username from(select
+     	 a.id
+		,a.beginDate
+		,a.endDate
+		,a.state
+		,a.createUser
+		,a.createDate
+		,a.type
+		,a.postionId
+    	,d.position
+		,d.workShop
+		,d.department
+		,d.workGroup
+	    ,c.courseName
+		from
+		ex_train a
+	    join view_course c on a.id=c.id
+	    join ex_user_department ff ON ff.roleId = #{roleId} AND c.deptId = ff.deptId
+	    left join view_position d on a.postionId=d.id
+	    <include refid="WHERE_CLAUSE"></include>
+		order by a.id desc
+		limit ${start},${end})a
+		join view_trainuser b on a.id = b.id
+	</select>
+
+	<update id="updateByIds" parameterType="com.netcity.module.entity.TrainEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="state1!=null">
+				state1 = #{state1},
+			</if>
+			<if test="updateUser !=null">
+				updateUser=#{updateUser},
+			</if>
+			<if test="updateDate !=null">
+				updateDate=#{updateDate},
+			</if>
+		</trim>
+		where id in (${ids})
+	</update>
+
+	<select id="selecyStudy" resultType="com.netcity.module.entity.StudyEntity" parameterType="com.netcity.module.entity.StudyEntity">
+		select a.*,b.usercode from(select
+		 a.id
+		,a.state
+		,a.type
+		,a.postionId
+		)
+	</select>
+
+	<insert id="insertStudy" parameterType="com.netcity.module.entity.StudyEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		usercode
+		,courseld
+		,studyState
+		,studyNotes
+		,studyImgUrl
+		)
+		values (
+		#{usercode}
+		,#{courseld}
+		,1
+		,#{studyNotes}
+		,#{studyImgUrl}
+		)
+	</insert>
+</mapper>

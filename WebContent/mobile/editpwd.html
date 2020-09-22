@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html class="ui-page-login">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>修改密码</title>
+		<!--标准mui.css-->
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<link href="css/css.css" rel="stylesheet" />
+		<style>
+			.mui-input-group {
+				margin-top: 10px;
+			}
+			
+			.mui-input-group:first-child {
+				margin-top: 20px;
+			}
+			
+			.mui-input-group label {
+				width: 30%;
+				text-align: right;
+			}
+			
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				width: 70%;
+			}
+			
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			
+			.mui-btn {
+				padding: 10px;
+			}
+			
+			.link-area {
+				display: block;
+				margin-top: 25px;
+				text-align: center;
+			}
+			
+			.spliter {
+				color: #bbb;
+				padding: 0px 8px;
+			}
+			
+			.oauth-area {
+				position: absolute;
+				bottom: 20px;
+				left: 0px;
+				text-align: center;
+				width: 100%;
+				padding: 0px;
+				margin: 0px;
+			}
+			
+			.oauth-area .oauth-btn {
+				display: inline-block;
+				width: 50px;
+				height: 50px;
+				background-size: 30px 30px;
+				background-position: center center;
+				background-repeat: no-repeat;
+				margin: 0px 20px;
+				/*-webkit-filter: grayscale(100%); */
+				border: solid 1px #ddd;
+				border-radius: 25px;
+			}
+			
+			.oauth-area .oauth-btn:active {
+				border: solid 1px #aaa;
+			}
+			
+			.oauth-area .oauth-btn.disabled {
+				background-color: #ddd;
+			}
+			.mui-input-group:first-child {
+				margin-top: 0;
+				padding-top: 20px;
+				padding-bottom: 5px;
+			}
+			.mui-input-group:before {
+				height: 0;
+			}
+			.mui-input-group:after {
+				height: 0;
+			}
+			.mui-input-group .mui-input-row:after {
+				right: 15px;
+			}
+			.mui-input-group label {
+				width: 31%;
+			}
+			.mui-input-row label~input, .mui-input-row label~select, .mui-input-row label~textarea {
+				width: 69%;
+			}
+			
+		</style>
+		<script>
+			localStorage.setItem('pageLoadOk','ok');
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">修改密码</h1>
+		</header>
+		<iframe name="hide" style="display:none"></iframe>
+		<div class="mui-content">
+			<div id='edit-form' class="mui-input-group">
+				<div class="mui-input-row">
+					<label>旧密码</label>
+					<input id='oldpwd' type="password" class="mui-input-clear mui-input font16 mui-font5" placeholder="请输入现在的密码">
+				</div>
+				<div class="mui-input-row">
+					<label>新密码</label>
+					<input id='newpass' type="password" class="mui-input-clear mui-input font16 mui-font5" placeholder="请输入要修改的密码">
+				</div>
+				<div class="mui-input-row">
+					<label>确认密码</label>
+					<input id='newpass2' type="password" class="mui-input-clear mui-input font16 mui-font5" placeholder="请输入确认密码">
+				</div>
+				<div class="mui-content-padded">
+					<button id='submitBtn' class="mui-btn mui-btn-block mui-btn-primary">提交修改</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="js/mui.enterfocus.js"></script>
+	<script>
+		(function($, doc) {
+			$.init({
+				statusBarBackground: '#f7f7f7',
+				swipeBack:true
+			});
+			$.ready(function() {
+				var submitBtn = doc.getElementById('submitBtn');
+				var checkPass = function(s) {
+					if (s.length < 8) {
+						return 0;
+					}
+					var ls = 0;
+					if (s.match(/([a-z])+/)) {
+						ls++;
+					}
+					if (s.match(/([0-9])+/)) {
+						ls++;
+					}
+					if (s.match(/([A-Z])+/)) {
+						ls++;
+					}
+					if (s.match(/[^a-zA-Z0-9]+/)) {
+						ls++;
+					}
+					return ls;
+				}
+				submitBtn.addEventListener('tap',function(event){
+					var oldpwd = doc.getElementById('oldpwd').value;
+					var newpass = doc.getElementById('newpass').value;
+					var newpass2 = doc.getElementById('newpass2').value;
+					if(oldpwd==''){
+						mui.toast('请输入原密码');
+						return false;
+					}
+					if(newpass==''){
+						mui.toast('请输入修改密码');
+						return;
+					}
+					if(newpass2==''){
+						mui.toast('请输入确认密码');
+						return;
+					}
+					if(newpass2!=newpass){
+						mui.toast('两次输入密码不一致');
+						return;
+					}
+					if(checkPass(newpass)<2){
+						mui.toast("密码必须是字母大写，小写字母，数字，特殊字符中任意三种组合且长度不小于8位，请重新设置！");
+				    	return false;
+					}
+					var obj = {
+						oldpwd:oldpwd,
+						newpass:newpass,
+						newpass2:newpass2
+					};
+					mui.ajax('../user/updatePassword.do',{
+						data:obj,
+						dataType:'json',
+						type:'post',
+						timeout:45000,
+						headers:{'Content-Type':'application/json'},	              
+						success:function(data){
+							mui.toast(data.message);
+							window.location = 'main.html';
+						},
+						error:function(xhr,type,errorThrown){
+							mui.toast('网络错误');
+						}
+					});
+				});
+				$.enterfocus('#edit-form input', function() {
+					$.trigger(loginButton, 'tap');
+				});
+			});
+		}(mui, document));
+	</script>
+</html>

@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>选择人员</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/css.css" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">选择人员</h1>
+		</header>
+		<div class="mui-content mui-scroll-wrapper">
+			<button id='submit' class="mui-btn mui-btn-block mui-btn-blue">确定</button>
+			<a id="checkall" class="mui-btn mui-btn-primary">全选</a>
+			<a id="uncheckall" class="mui-btn mui-btn-primary">取消全选</a>
+			 <div class="mui-scroll" id="userlist">
+			 	正在加载....
+			 </div>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script src="../plugins/jquery/jquery.serializejson.js"></script>
+	<script th:inline="javascript">
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		$.ready(function() {
+			var id = [[${param.id}]];
+			var dept = 1*[[${param.departmentId}]];
+			var list = [];
+			$$('#checkall').on('tap',function(e){
+				$$('input:checkbox[name=ids]').prop('checked',true);
+				e.stopPropagation();
+			});
+			$$('#uncheckall').on('tap',function(e){
+				$$('input:checkbox[name=ids]').removeAttr('checked');
+				e.stopPropagation();
+			});
+			$$('#submit').on('tap',function(e){
+				var arr = new Array();
+				$$('input:checkbox[name=ids]:checked').each(function(i){
+					var id = $$(this).val();
+					var obj = list.find(function(el){return el.id==id;});
+					arr.push(obj);
+				});
+				var myEvent = new CustomEvent('showuser',{
+					detail:{
+						id:id,
+						data:arr
+					}
+				});
+				if(window.parent.dispatchEvent) {  
+				    window.parent.dispatchEvent(myEvent);
+				} else {
+				    window.parent.fireEvent(myEvent);
+				}
+				e.stopPropagation();
+				e.preventDefault();
+				return false;
+			});
+			var scroll = $(".mui-scroll-wrapper").scroll();
+			var param = {};
+			if(dept&&dept>0){
+				param.departmentId = dept;
+			}
+			$.ajax('../train/queryUserbypostion.do',{
+				data:param,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					list = data.data;
+					$$('#userlist').html('');
+					data.data.forEach(function(e){
+						$$('#userlist').append('<div class="mui-input-row mui-checkbox"><label>'+e.name+'</label>'
+								+'<input type="checkbox" name="ids" value = "'+e.id+'"/></div>');
+					});
+					scroll.reLayout();
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+	}(mui, document, jQuery));
+	</script>
+</html>

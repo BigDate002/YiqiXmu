@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Department">
+	<resultMap type="com.netcity.module.entity.DepartmentEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="level" property="level" />
+		<result column="parentId" property="parentId" />
+		<result column="parentName" property="parentName" />
+		<result column="descript" property="descript" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<result column="state" property="state" />
+		<result column="showOrder" property="showOrder" />
+		<result column="lastUpdateDate" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">ex_department</sql>
+	<sql id="BASE_COLUMNS">
+		id,code,name,level,parentId,showOrder,state,descript,createUser,createDate,lastUpdateDate,
+		(select name from
+		<include refid="Base_Column_List" />
+		b where b.code=
+		<include refid="Base_Column_List" />
+		.parentId) as parentName
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="roleId!=null">
+				and exists (select 1 from ex_user_department where roleId=#{roleId} and deptId=ex_department.code)
+			</if>
+			<if test="name!=null and name!=''">
+				and name = #{name}
+			</if>
+			<if test="code !=null and code!=''">
+				and code = #{code}
+			</if>
+			<if test="level!=null and level!=''">
+				and level = #{level}
+			</if>
+			<if test="parentId!=null and parentId!=''">
+				and parentId = #{parentId}
+			</if>
+			<if test="descript!=null and descript!=''">
+				and descript = #{descript}
+			</if>
+			<if test="createUser!=null and createUser!=''">
+				and createUser = #{createUser}
+			</if>
+			<if test="createDate!=null">
+				and createDate = #{createDate}
+			</if>
+			<if test="state!=null">
+				and state = #{state}
+			</if>
+			<if test="departmentId !=null">
+				and (parentId = #{departmentId}
+				or exists (select 1 from ex_department x where x.code=ex_department.parentId and
+				x.parentid=#{departmentId}) or (id!=1 and #{departmentId}=1))
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.DepartmentEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS" />
+		from
+		<include refid="Base_Column_List" />
+		where code = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.DepartmentEntity" parameterType="com.netcity.module.entity.DepartmentEntity">
+		select
+		<include refid="BASE_COLUMNS" />
+		from
+		<include refid="Base_Column_List" />
+		<include refid="WHERE_CLAUSE" />
+		order by level,parentId,showOrder
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.DepartmentEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS" />
+		from
+		<include refid="Base_Column_List" />
+		<include refid="WHERE_CLAUSE" />
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.DepartmentEntity">
+		update
+		<include refid="Base_Column_List" />
+		set
+		<trim suffixOverrides=",">
+			<if test="code!=null">
+				code = #{code},
+			</if>
+			<if test="state!=null">
+				state = #{state},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="level !=null">
+				level=#{level},
+			</if>
+			<if test="showOrder !=null">
+				showOrder=#{showOrder},
+			</if>
+			<if test=" parentId !=null">
+				parentId=#{parentId},
+			</if>
+			<if test="descript !=null">
+				descript=#{descript},
+			</if>
+			<if test="lastUpdateDate !=null">
+				lastUpdateDate = #{lastUpdateDate},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<update id="updateByIds" parameterType="com.netcity.module.entity.DepartmentEntity">
+		update
+		<include refid="Base_Column_List" />
+		set
+		<trim suffixOverrides=",">
+			<if test="code!=null">
+				code = #{code},
+			</if>
+			<if test="state!=null">
+				state = #{state},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="level !=null">
+				level=#{level},
+			</if>
+			<if test=" parentId !=null">
+				parentId=#{parentId},
+			</if>
+			<if test="descript !=null">
+				descript=#{descript},
+			</if>
+		</trim>
+		where id in (${ids})
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="Base_Column_List" />
+		where id = #{id}
+	</delete>
+
+	<delete id="deleteByIds" parameterType="java.lang.String">
+		delete from
+		<include refid="Base_Column_List" />
+		where id in (${_parameter})
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.DepartmentEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="Base_Column_List" />
+		(
+		code,name,level,parentId,descript,createUser,createDate,showOrder,lastUpdateDate,state
+		)
+		select
+		#{code},#{name},#{level},#{parentId},#{descript},#{createUser},now(),
+		<if test="showOrder!=null and showOrder!=0">
+			#{showOrder}
+		</if>
+		<if test="showOrder==null or showOrder==0">
+			ifnull(max(showOrder),0)+1
+		</if>
+		,#{lastUpdateDate},0
+		from ex_department
+		right join (select 1 as mn) b on 1=1	
+		and parentId=#{parentId} group by parentId
+	</insert>
+
+	<resultMap type="com.netcity.base.entity.LayTree" id="LayTreeResultMap">
+		<result column="code" property="id" />
+		<result column="name" property="name" />
+		<result column="pid" property="pid" />
+		<result column="level" property="level" />
+	</resultMap>
+	<select id="findDepartments" resultMap="LayTreeResultMap" parameterType="com.netcity.module.entity.UserEntity">
+		select a.id,a.code,a.name,level,parentId as pid
+		from ex_department a
+		<if test="usercode != null and usercode!= 'admin'">
+		join ex_user_department b on a.code=b.deptId and b.roleId=#{id}
+		</if>
+		where a.state=0
+		order by case level when '一级' then 1 when '二级' then 2 when '三级' then 3 else 4 end,a.id
+	</select>
+	<select id="findDept" parameterType="java.util.List" resultMap="BookResultMap">
+		select
+		a.id,
+		case a.level
+		when '四级' then concat(c.name,'-',b.name,'-',a.name) 
+		when '三级' then concat(b.name,'-',a.name)  end
+		as name,
+		a.code
+		from
+		ex_department a
+		join ex_department b on a.parentId=b.code
+		join ex_department c on
+		b.parentId=c.code
+		where a.level in ('三级','四级')
+	</select>
+
+	<select id="findLastUpdateOne" resultMap="BookResultMap" >
+		select
+		id,lastUpdateDate
+		from ex_department
+		order by lastUpdateDate desc limit 0,1
+	</select>
+
+	<select id="queryOutList" resultMap="BookResultMap" parameterType="com.netcity.module.entity.DepartmentEntity">
+		WITH DEPT AS (
+		SELECT GroupId as code,G_CName as name,G_ParentID as parentId,G_Delete as state,updateDate as lastUpdateDate,G_ShowOrder as showOrder,'一级' as level FROM view_zcryzz_group
+		WHERE GroupId=3756 
+		UNION ALL 
+		SELECT A.GroupId as code,A.G_CName as name,A.G_ParentID as parentId,A.G_Delete as state,A.updateDate as lastUpdateDate,A.G_ShowOrder as showOrder, 
+		case b.level when '一级' then '二级' when '二级' then '三级' else '四级' end as level FROM view_zcryzz_group A JOIN DEPT B ON B.code=A.G_ParentID 
+		) 
+		SELECT * FROM DEPT 
+		<where>
+			and state=0
+			<if test="lastUpdateDate !=null">
+				and lastUpdateDate &gt; #{lastUpdateDate}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectByRoleId" parameterType="com.netcity.module.entity.DepartmentEntity" resultType="com.netcity.module.entity.DepartmentEntity">
+		select
+		  a.code as id,a.name,a.parentId,ifnull(b.id,0) as checked
+		from ex_department a
+		left join ex_user_department b on a.code=b.deptId
+		<if test="_parameter !=null">
+			and b.roleId=#{roleId}
+		</if>
+		where a.state=0
+		<if test="id!=null">
+			and exists (select 1 from ex_user_department where roleId=#{id} and deptId=a.code)
+		</if>
+	</select>
+</mapper>

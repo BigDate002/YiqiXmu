@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+	</head>
+
+	<body>
+		<script src="js/mui.min.js"></script>
+		<script src="//g.alicdn.com/dingding/dingtalk-jsapi/2.6.41/dingtalk.open.js"></script>
+		<script>
+			(function($, doc) {
+				$.init({
+					statusBarBackground: '#FFFFFF'
+				});
+				$.ready(function() {
+					var _ddCode = null;
+					dd.ready(
+					    function () {
+					        dd.runtime.permission.requestAuthCode(
+					            {
+					                corpId: "dingbde3803309765cb835c2f4657eb6378f", // 企业id
+					                onSuccess: function (info) {
+					                    _ddCode = info.code;
+					                    window.location = "ddlogin.do?code="+_ddCode;
+					                }
+					            }
+					        );
+					    }
+					);
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>

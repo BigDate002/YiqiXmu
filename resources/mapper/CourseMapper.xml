@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Course">
+	<resultMap type="com.netcity.module.entity.CourseEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="state" property="state" />
+		<result column="remark" property="remark" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<result column="updateUser" property="updateUser" />
+		<result column="updateDate" property="updateDate" />
+		<result column="positionId" property="positionId" />
+		<result column="positionName" property="positionName" />
+		<result column="type" property="type" />
+		<result column="department" property="department" />
+		<result column="departmentId" property="departmentId" />
+		<result column="workShop" property="workShop" />
+		<result column="deptId" property="workShopId" />
+		<collection property="positions" column="id" select="selectPositions">
+			
+		</collection>
+	</resultMap>
+	<select id="selectPositions" resultType="com.netcity.module.entity.PositionEntity">
+		select
+			a.id,
+			a.name,
+			a.type,
+			a.deptId,
+			a.examPeriod,
+			a.remark,
+			a.createUser,
+			a.createDate,
+			a.state,
+			b.name as workShop,
+			c.name as department,
+			c.code as departmentId,
+			d.name as workGroup
+		from
+		ex_position a
+		join ex_department b on a.deptId = b.code
+		join ex_department c on b.parentId = c.code
+		left join ex_department d on a.workGroupId=d.code
+		where a.id in (select id from ex_course_position where courseId=#{_parameter})
+	</select>
+	<sql id="TABLE_NAME">
+		ex_course
+	</sql>
+	<sql id="BASE_COLUMNS">
+		id,
+		name,
+		createUser,
+		createDate,
+		updateUser,
+		updateDate,
+		state,
+		remark,
+		type
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="departmentId !=null">
+				and (
+				d.code = #{departmentId} or e.code = #{departmentId} or f.code = #{departmentId}
+				)
+			</if>
+			<if test="roleId!=null">
+				and exists (select 1 from ex_user_department z where roleId=#{roleId} and z.deptId=a.deptId)
+			</if>
+			<if test="name!=null and name !=''">
+				and a.name = #{name}
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and a.createUser = #{createUser}
+			</if>
+			<if test="createDate!=null ">
+				and a.createDate = #{createDate}
+			</if>
+			<if test="updateUser!=null and updateUser !=''">
+				and a.updateUser = #{updateUser}
+			</if>
+			<if test="updateDate!=null ">
+				and a.updateDate = #{updateDate}
+			</if>
+			<if test="state!=null ">
+				and a.state = #{state}
+			</if>
+			<if test="remark!=null and remark !=''">
+				and a.remark = #{remark}
+			</if>
+			<if test="workShopId !=null">
+				and a.deptId = #{workShopId}
+			</if>
+			<if test="positionId !=null">
+				and b.positionId = #{positionId}
+			</if>
+			<if test="type !=null">
+				and a.type = #{type}
+			</if>
+			<if test="department !=null and department !=''">
+				and e.name like '${department}%'
+			</if>
+			<if test="workShop !=null and workShop !=''">
+				and d.name like '${workShop}%'
+			</if>
+			<if test="positionName !=null and positionName !=''">
+				and c.name like '${positionName}%'
+			</if>
+			
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.CourseEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include> a
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultMap="BookResultMap" parameterType="com.netcity.module.entity.CourseEntity">
+		select
+		a.id,
+		a.name,
+		a.createUser,
+		a.createDate,
+		a.updateUser,
+		a.updateDate,
+		a.state,
+		a.remark,
+		a.type,
+		a.deptId,
+		group_concat(c.id) as positionId,
+		group_concat(c.name order by c.id) as positionName,
+		e.name as department,
+		d.name as workShop,
+		e.code as departmentId
+		from
+ 		ex_course a
+		left join ex_course_position b on b.courseId=a.id
+		left join ex_position c on c.id=b.positionId
+		left join ex_department d on a.deptId=d.code
+		left join ex_department e on d.parentId=e.code
+		left join ex_department f on e.parentId=f.code
+		<include refid="WHERE_CLAUSE"></include>
+		group by a.id
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.CourseEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include> a
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.CourseEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="name !=null">
+				name=#{name},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+			<if test="updateUser !=null">
+				updateUser=#{updateUser},
+			</if>
+			<if test="workShopId !=null">
+				deptId=#{workShopId},
+			</if>
+			<!-- <if test="updateDate !=null"> updateDate=#{updateDate}, </if> -->
+			<if test="state !=null">
+				state=#{state},
+			</if>
+			<if test="remark !=null">
+				remark=#{remark},
+			</if>
+			<if test="type !=null">
+				type=#{type},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		update
+		<include refid="TABLE_NAME"></include>
+		set state = 0
+		where id = #{id}
+	</delete>
+	
+	<delete id="deleteByIds" parameterType="java.lang.String">
+		update
+		<include refid="TABLE_NAME"></include> set state=0
+		where id in (${_parameter})
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.CourseEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			name,
+			createUser,
+			createDate,
+			remark,
+			deptId,
+			type
+		)
+		values (
+			#{name},
+			#{createUser},
+			now(),
+			#{remark},
+			#{workShopId},
+			#{type}
+		)
+	</insert>
+	<insert id="insertBatchOnce" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+	insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			name,
+			createUser,
+			createDate,
+			remark,
+			deptId,
+			type
+		)
+		values 
+		<foreach collection="list" item="i" separator=",">
+		(
+			#{i.name},
+			#{i.createUser},
+			now(),
+			#{i.remark},
+			#{i.workShopId},
+			#{i.type}
+		)
+		</foreach>
+	</insert>
+	
+	<select id="findExportList" resultMap="BookResultMap" parameterType="com.netcity.module.entity.CourseEntity">
+		select
+		a.id,
+		a.name,
+		a.createUser,
+		a.createDate,
+		a.updateUser,
+		a.updateDate,
+		a.state,
+		a.remark,
+		a.type,
+		a.deptId,
+		group_concat(c.id) as positionId,
+		group_concat(c.name order by c.id) as positionName,
+		e.name as department,
+		d.name as workShop,
+		e.code as departmentId,
+		g.name as workGroup
+		from
+ 		ex_course a
+		left join ex_course_position b on b.courseId=a.id
+		left join ex_position c on c.id=b.positionId
+		left join ex_department d on a.deptId=d.code
+		left join ex_department e on d.parentId=e.code
+		left join ex_department f on e.parentId=f.code
+		left join ex_department g on c.workGroupId=g.code
+		<include refid="WHERE_CLAUSE"></include>
+		group by a.id,c.workGroupId
+	</select>
+</mapper>

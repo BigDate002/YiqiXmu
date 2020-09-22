@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Practice">
+	<resultMap type="com.netcity.module.entity.PracticeEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="code" property="Code" />
+		<result column="kaohe1" property="kaohe1" />
+		<result column="kaohe2" property="kaohe2" />
+		<result column="kaohe3" property="kaohe3" />
+		<result column="kaohe4" property="kaohe4" />
+		<result column="result" property="result" />
+		<result column="score" property="score" />
+		<result column="usercode" property="usercode" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_practice
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			id,
+			code,
+			kaohe1,
+			kaohe2,
+			kaohe3,
+			kaohe4,
+			result,
+			score,
+			createUser,
+			createDate,
+			usercode,
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="Code!=null and Code !=''">
+				and code = #{Code}
+			</if>
+			<if test="kaohe1!=null ">
+				and kaohe1 = #{kaohe1}
+			</if>
+			<if test="kaohe2!=null ">
+				and kaohe2 = #{kaohe2}
+			</if>
+			<if test="kaohe3!=null ">
+				and kaohe3 = #{kaohe3}
+			</if>
+			<if test="kaohe4!=null ">
+				and kaohe4 = #{kaohe4}
+			</if>
+			<if test="result!=null ">
+				and result = #{result}
+			</if>
+			<if test="score!=null ">
+				and score = #{score}
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and createUser = #{createUser}
+			</if>
+			<if test="usercode!=null and usercode !=''">
+				and usercode = #{usercode}
+			</if>
+			<if test="createDate!=null ">
+				and createDate = #{createDate}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.PracticeEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.PracticeEntity" parameterType="com.netcity.module.entity.PracticeEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.PracticeEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.PracticeEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="Code !=null">
+				code=#{Code},
+			</if>
+			<if test="kaohe1 !=null">
+				kaohe1=#{kaohe1},
+			</if>
+			<if test="kaohe2 !=null">
+				kaohe2=#{kaohe2},
+			</if>
+			<if test="kaohe3 !=null">
+				kaohe3=#{kaohe3},
+			</if>
+			<if test="kaohe4 !=null">
+				kaohe4=#{kaohe4},
+			</if>
+			<if test="result !=null">
+				result=#{result},
+			</if>
+			<if test="score !=null">
+				score=#{score},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.PracticeEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			code,
+			kaohe1,
+			kaohe2,
+			kaohe3,
+			kaohe4,
+			result,
+			score,
+			createUser,
+			createDate,
+			usercode
+		)
+		values (
+			#{Code},
+			#{kaohe1},
+			#{kaohe2},
+			#{kaohe3},
+			#{kaohe4},
+			#{result},
+			#{score},
+			#{createUser},
+			now(),
+			#{usercode}
+		)
+	</insert>
+</mapper>

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Qualification">
+	<resultMap type="com.netcity.module.entity.QualificationEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="userCode" property="userCode" />
+		<result column="postionId" property="postionId" />
+		<result column="beginDate" property="beginDate" />
+		<result column="endDate" property="endDate" />
+		<result column="grantUser" property="grantUser" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<result column="code" property="code" />
+		<result column="effectiveDate" property="effectiveDate" />
+		
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_qualification
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			id,
+			userCode,
+			postionId,
+			beginDate,
+			endDate,
+			grantUser,
+			createUser,
+			createDate,
+			code,
+			effectiveDate
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="state !=null">
+				CASE
+				WHEN H.USERCODE IS NOT NULL THEN 3
+				WHEN I.USERCODE IS NOT NULL AND (J.USERCODE IS NULL OR J.CREATEDATE&lt;I.CREATEDATE) THEN 4
+				WHEN A.ENDDATE&lt;SYSDATE() THEN 2 WHEN TIMESTAMPDIFF(MONTH,SYSDATE(),A.ENDDATE)&lt;1 THEN 1 ELSE 0 END=#{state}
+			</if>
+			<if test="departmentId !=null">
+				and (c.code = #{departmentId} or d.code = #{departmentId} or e.code = #{departmentId} or g.code = #{departmentId})
+			</if>
+			<if test="userCode!=null and userCode !=''">
+				and a.userCode = #{userCode}
+			</if>
+			<if test="post !=null and post !=''">
+				and f.name = #{post}
+			</if>
+			<if test="postionId!=null ">
+				and a.postionId = #{postionId}
+			</if>
+			<if test="beginDate!=null ">
+				and a.beginDate = #{beginDate}
+			</if>
+			<if test="workShop!=null and workShop!=''">
+				and c.name like concat('%',#{workShop},'%')
+			</if>
+			<if test="department !=null and department !=''">
+				and d.name like concat('%',#{department},'%')
+			</if>
+			<if test="endDate!=null and endDate !=''">
+				and a.endDate = #{endDate}
+			</if>
+			<!-- <if test="grantUser!=null and grantUser !=''">
+				and a.grantUser = #{grantUser}
+			</if> -->
+			<if test="createUser!=null and createUser !=''">
+				and a.createUser = #{createUser}
+			</if>
+			<if test="createDate!=null ">
+				and a.createDate = #{createDate}
+			</if>
+			<if test="query !=null and query !=''">
+				and (a.userCode like concat('%',#{query},'%') or b.name like concat('%',#{query},'%'))				
+			</if>
+			<if test="grantUser !=null and grantUser !=''">
+				and (
+				a.userCode like concat('%',#{grantUser},'%') 
+				or b.name like concat('%',#{grantUser},'%')
+				or c.name like concat('%',#{grantUser},'%')
+				or d.name like concat('%',#{grantUser},'%')
+				or e.name like concat('%',#{grantUser},'%')
+				)				
+			</if>
+			<if test="beginDate1 !=null and beginDate1 !=''">
+				and a.beginDate &gt;= #{beginDate1}
+			</if>
+			<if test="beginDate2 !=null and beginDate2 !=''">
+				and a.beginDate &lt;= #{beginDate2}
+			</if>
+			<if test="endDate1 !=null and endDate1 !=''">
+				and a.endDate &gt;= #{endDate1}
+			</if>
+			<if test="endDate2 !=null and endDate2 !=''">
+				and a.endDate &lt;= #{endDate2}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.QualificationEntity" parameterType="java.lang.Long">
+		select
+			a.id,
+			a.userCode,
+			a.postionId,
+			a.beginDate,
+			a.endDate,
+			a.grantUser,
+			a.createUser,
+			a.createDate,
+			b.name as username,
+			e.name as workGroup,
+			c.name as workShop,
+			d.name as department,
+			f.name as post,
+			a.code,
+			a.type,
+			a.effectiveDate,
+			CASE
+				WHEN H.USERCODE IS NOT NULL THEN 3
+				WHEN I.USERCODE IS NOT NULL AND (J.USERCODE IS NULL OR J.CREATEDATE&lt;I.CREATEDATE) THEN 4
+				WHEN A.ENDDATE&lt;SYSDATE() THEN 2 WHEN TIMESTAMPDIFF(MONTH,SYSDATE(),A.ENDDATE)&lt;1 THEN 1 ELSE 0 END AS state
+			from
+			<include refid="TABLE_NAME"></include> a
+			join ex_position f on f.id=a.postionId	
+			join ex_user b on a.usercode=b.usercode
+			join ex_department c on f.deptId = c.code
+			join ex_department d on d.code=c.parentid
+			left join ex_department e on e.code=f.workGroupId
+			left join view_fushen h on h.usercode=a.usercode and a.postionId=h.positionId and a.createDate&lt;=h.createDate
+			left join view_bujige i on i.usercode=a.usercode and a.postionId=i.positionId and a.createDate&lt;=i.createDate
+			left join view_pass   j on j.usercode=a.usercode and a.postionId=j.positionId and a.createDate&lt;=j.createDate
+		where a.id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.QualificationEntity" parameterType="com.netcity.module.entity.QualificationEntity">
+		select
+			a.id,
+			a.userCode,
+			a.postionId,
+			a.beginDate,
+			a.endDate,
+			a.grantUser,
+			a.createUser,
+			a.createDate,
+			b.name as username,
+			e.name as workGroup,
+			c.name as workShop,
+			d.name as department,
+			f.name as post,
+			a.code,
+			a.type,
+			a.effectiveDate,
+			CASE
+				WHEN H.USERCODE IS NOT NULL THEN 3
+				WHEN I.USERCODE IS NOT NULL AND (J.USERCODE IS NULL OR J.CREATEDATE&lt;I.CREATEDATE) THEN 4
+				WHEN A.ENDDATE&lt;SYSDATE() THEN 2 WHEN TIMESTAMPDIFF(MONTH,SYSDATE(),A.ENDDATE)&lt;1 THEN 1 ELSE 0 END AS state
+		from
+		<include refid="TABLE_NAME"></include> a
+		join ex_position f on f.id=a.postionId	
+		join ex_user b on a.usercode=b.usercode
+		join ex_department c on f.deptId = c.code
+		join ex_department d on d.code=c.parentId
+		join ex_department g on g.code=d.parentId
+		left join ex_department e on e.code=f.workGroupId
+		left join view_fushen h on h.usercode=a.usercode and a.postionId=h.positionId and a.createDate&lt;=h.createDate
+		left join view_bujige i on i.usercode=a.usercode and a.postionId=i.positionId and a.createDate&lt;=i.createDate
+		left join view_pass   j on j.usercode=a.usercode and a.postionId=j.positionId and a.createDate&lt;=j.createDate
+		<if test="roleId!=null ">
+			join ex_user_department z on z.roleId=#{roleId} and b.deptId=z.deptId
+		</if>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.QualificationEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.QualificationEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="userCode !=null">
+				userCode=#{userCode},
+			</if>
+			<if test="postionId !=null">
+				postionId=#{postionId},
+			</if>
+			<if test="beginDate !=null">
+				beginDate=#{beginDate},
+			</if>
+			<if test="endDate !=null">
+				endDate=#{endDate},
+			</if>
+			<if test="grantUser !=null">
+				grantUser=#{grantUser},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+			<if test="effectiveDate !=null">
+				effectiveDate=#{effectiveDate},
+			</if>
+			<if test="type !=null">
+				type = #{type},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.QualificationEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		<trim suffixOverrides=","> 
+			code,
+			userCode,
+			postionId,
+			beginDate,
+			endDate,
+			grantUser,
+			createUser,
+			createDate,
+			type,
+			effectiveDate
+		</trim>
+		)
+		values (
+		<trim suffixOverrides=",">
+			#{code},
+			#{userCode},
+			#{postionId},
+			#{beginDate},
+			#{endDate},
+			#{grantUser},
+			#{createUser},
+			now(),
+			#{type},
+			#{effectiveDate}
+		</trim>
+		)
+	</insert>
+</mapper>

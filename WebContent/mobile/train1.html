@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title>培训中心</title>
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link href="css/mui.min.css" rel="stylesheet" />
+<link href="css/css.css" rel="stylesheet" />
+<link href="css/mui.picker.min.css" rel="stylesheet" />
+<style>
+
+.mbar{
+	overflow: hidden;
+	background: #fff;
+	padding: 15px;
+	padding-bottom: 0;
+}
+.mbar button {
+/* 	float: left; */
+	width: 48%;
+	height: 36px;
+/* 	margin: 0 5%; */
+}
+.mbar_fl{
+	float: left; 
+}
+.mbar_fr{
+	float: right; 
+}
+.mui-table-view:before {
+	height: 0;
+}
+#frm2 .datepicker{
+	opacity: 0;
+	width: 65%;
+}
+button.datepicker {
+	width: 65%!important;
+	opacity: 0;
+}
+.mui-table-view-cell:after {
+	right: 15px;
+}
+ .mui-input-group .mui-input-row:after {
+	right: 15px;
+}
+ a.xzr {
+	right: 15px!important;
+}
+ .mui-input-group .mui-input-row {
+	height: auto!important;
+}
+ div#course {
+	position: initial;
+}
+ .mui-input-row label {
+	padding: 20px !important;
+}
+ .mui-input-row select {
+	display: block;
+	margin-bottom: 5px!important;
+}
+.mui-input-group .mui-input-row {
+    height: auto!important;
+}
+
+</style>
+</head>
+
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">培训中心</h1>
+		<div id="div"></div>
+	</header>
+	<div class="mui-content">
+		<div class="mbar">
+			<button id='btn1' class="mui-btn-blue mbar_fl">发布通用培训</button>
+			<button id='btn2' class="mui-btn-blue mbar_fr">发布资质培训</button>
+		</div>
+		<ul class="mui-table-view">
+			<li class="mui-table-view-cell" th:each="item,userStat : ${list}">
+				<span th:text="${'类型:'+(item.type=='1'?'资质培训':'通用培训')+(item.position==null?'':' 岗位:'+item.position)}"></span>
+				<br/><span th:text="${'课程:'+item.courseName}"></span>
+				<p class='mui-ellipsis' th:text="${'开始日期:从'+#dates.format(item.beginDate, 'yyyy年MM月dd日')}"></p>
+				<p class='mui-ellipsis' th:text="${'结束日期:从'+#dates.format(item.endDate, 'yyyy年MM月dd日')}"></p>
+				<p><button type="button" th:if="${item.getState() eq 1}" th:attr="data-id=${item.getId()}" class="mui-btn mui-btn-primary cancleBtn" >取消培训</button>
+				<button type="button" th:if="${item.getState() eq 1}" th:attr="data-id=${item.getId()}" class="mui-btn mui-btn-primary stopBtn" >结束培训</button></p>
+			</li>
+		</ul>
+		<div id="popover" class="mui-popover" style="width: 100%">
+			<form class="mui-input-group" id="frm1">
+				<div class="mui-input-row">
+					<label>开始日期</label>
+					<input type="text" placeholder="请选择开始日期" id="beginDate" name="beginDate" readonly="readonly" class="mui-input-clear mui-h57 font16"/>
+					<button type="button" style="position:fixed;right:10px" class="mui-btn mui-btn-primary datepicker mui-h57">选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>结束日期</label>
+					<input type="text" placeholder="请选择结束日期" id="endDate" name="endDate" readonly="readonly" class="mui-input-clear mui-h57 font16"/>
+					<button type="button" style="position:fixed;right:10px" class="mui-btn mui-btn-primary datepicker mui-h57">选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>培训讲师</label>
+					<select id="teacher" style="color:orange;" name="teacher">
+						<option value>--请选择--</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>培训课程</label>
+					<select name="courseId" id="courseId">
+						<option value>请选择培训课程</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>部门</label>
+					<select name="department" id="dept">
+						<option value="0">请选择部门</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>科室/车间</label>
+					<select name="workShop" id="workShop">
+						<option value="0">请选择科室/车间</option>
+					</select>
+				</div>
+				<div class="mui-input-row" style="height:250px;">
+					<label>培训人员</label>
+					<a targe="userlist" class="xzr mui-btn mui-btn-primary mui-btn-jl">选择人员</a>
+          			<br/><br/>
+          			<div id="userlist"></div>
+				</div>
+				<div class="mui-button-row mbar mui-h67">
+					<button type="button" id="btnOk" class="mui-btn mui-btn-blue mbar_fl">确认</button>
+					<button type="button" id="btnCancle" class="mui-btn mui-btn-white mbar_fr">取消</button>
+				</div>
+			</form>
+		</div>
+		
+		
+		<div id="popover2" class="mui-popover" style="width: 100%">
+			<form class="mui-input-group" id="frm3">
+				<div class="mui-input-row">
+					<label>开始日期</label>
+					<input type="text" placeholder="请选择开始日期" name="beginDate" readonly="readonly" class="mui-input-clear mui-h57 font16"/>
+					<button type="button" style="position:fixed;right:10px" class="mui-btn mui-btn-primary datepicker mui-h57">选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>结束日期</label>
+					<input type="text" placeholder="请选择结束日期" name="endDate" readonly="readonly" class="mui-input-clear mui-h57 font16"/>
+					<button type="button" style="position:fixed;right:10px" class="mui-btn mui-btn-primary datepicker mui-h57">选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>部门</label>
+					<select name="department" id="department">
+						<option value="0">请选择部门</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>科室/车间</label>
+					<select name="workShop" id="workShopId">
+						<option value="0">请选择科室/车间</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>班组</label>
+					<select name="workGroup" id="workGroup">
+						<option value="0">请选择班组</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>培训岗位</label>
+					<select id="postionId" name="postionId">
+						<option value>请选择培训岗位</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>培训课程</label>
+					<div>
+						<div id="course" class="mui-scroll" style="padding-left:120px;"></div>
+					</div>
+				</div>
+				<div class="mui-input-row" style="height:250px;">
+					<label>培训人员</label>
+					<a targe="userlist1" class="xzr mui-btn mui-btn-primary mui-btn-jl">选择人员</a>
+          			<br/><br/>
+          			<div id="userlist1"></div>
+				</div>
+				<div class="mui-button-row mbar mui-h67">
+					<button type="button" id="btnOk1" class="mui-btn mui-btn-blue mbar_fl">确认</button>
+					<button type="button" id="btnCancle1" class="mui-btn mui-btn-white mbar_fr">取消</button>
+				</div>
+			</form>
+		</div>
+		
+		<div id="popover1" class="mui-popover" style="width: 100%">
+			<form class="mui-input-group" id="frm2">
+				<input type="text" id="id" name="id" style="display:none;" />
+				<div class="mui-input-row">
+					<label>开始日期</label>
+					<input type="text" placeholder="请选择开始日期" name="beginDate" readonly="readonly" class="mui-input-clear"/>
+					<button type="button" style="position:absolute;top:1px;right:3px" class="mui-btn mui-btn-primary datepicker">选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>结束日期</label>
+					<input type="text" placeholder="请选择结束日期" name="endDate" readonly="readonly" class="mui-input-clear"/>
+					<button type="button" style="position:absolute;top:1px;right:3px;" class="mui-btn mui-btn-primary datepicker">选择</button>
+				</div>
+				<div class="mui-input-row">
+					<label>考试时长</label>
+					<input type="number" placeholder="请输入考试时长" name="examtime" class="mui-input-clear"/>
+				</div>
+				<div class="mui-button-row">
+					<button type="button" id="btnYes" class="mui-btn mui-btn-primary">确认</button>
+					<button type="button" id="btnQuxiao" class="mui-btn mui-btn-primary" style="margin-left:100px;">取消</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<iframe style="display: none;position: absolute; top: 0px;" id="checkuser" frameborder="0" width="100%" height="100%"></iframe>
+</body>
+<script src="js/mui.min.js"></script>
+<script src="js/mui.picker.min.js"></script>
+<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+<script src="../plugins/jquery/jquery.serializejson.js"></script>
+<script>
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		$.ready(function(){
+			var scroll = $(".mui-scroll-wrapper").scroll();
+		});
+		$('.mbar').on('tap','#btn1',function(){
+			_departmentId = 0;
+			$$('#userlist').html('');
+			$$('#workShop').find("option").not(":first").remove();
+			$$('#workShopId').find("option").not(":first").remove();
+			frm1.reset();
+			persons = [];
+			$('#popover').popover('show',doc.getElementById("btn1"));
+		});
+		$('.mbar').on('tap','#btn2',function(){
+			persons = [];
+			_departmentId = 0;
+			$$('#userlist1').html('');
+			$$('#workShop').find("option").not(":first").remove();
+			$$('#workShopId').find("option").not(":first").remove();
+			$$('#workGroup').find("option").not(":first").remove();
+			$$('#postionId').find("option").not(":first").remove();
+			frm3.reset();
+			$('#popover2').popover('show',doc.getElementById("btn2"));
+		});
+		$$('#btnCancle').on('tap',function(){
+			$('#popover').popover('hide');
+		});
+		$$('#btnCancle1').on('tap',function(){
+			$('#popover2').popover('hide');
+		});
+		$$('#btnQuxiao').on('tap',function(){
+			$('#popover1').popover('hide');
+		});
+		var courseList = [];
+		$$("#postionId").change(function(){
+			var post = $$(this).val()
+			$.ajax('../course/queryList.do?type=1&positionId='+post,{
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					var htm = '';
+					if(data.data.length>0){
+						courseList = data.data;
+						frm1.reset();
+						htm = '<label style="width:auto;padding-bottom:0px">';
+						data.data.forEach(function(i){
+							var html =  '<select name="shifu'+i.id+'" style="display:inline;clear:both;height:21px;width:auto;margin-bottom:0px;color:orange">'+$$('#teacher').html()+'</select>';
+							htm += '<p><span style="display:inline-block;min-width:60px;text-align:right;">'+i.name + '</span>&nbsp;指导师傅:' + html+'</p>';
+						});
+						htm += '</label>';
+					}
+					$$('#course').html(htm);
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+		
+		$$('.cancleBtn').on('tap',function(e){
+			var id = $$(this).attr('data-id');
+			var url = '../train/cancel.do';
+			postMethod(url,id);
+		});
+		$$('.stopBtn').on('tap',function(e){
+			var id = $$(this).attr('data-id');
+			frm2.reset();
+			$$('#id').val(id);
+			$('#popover1').popover('show',doc.getElementById("div"));
+		});
+		
+		$$('#btnYes').on('tap',function(e){
+			var data = $$('#frm2').serializeJSON();
+			$.ajax('../train/stop.do',{
+				data: data,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					mui.toast(data.message);
+					if(data.flag)
+						location.reload();
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+		
+		var postMethod  = function(url,id){
+			$.ajax(url,{
+				data:JSON.stringify({id:id}), 
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					mui.toast(data.message);
+					if(data.flag)
+						location.reload();
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		};
+		
+		$$('#btnOk').on('tap',function(){
+			var obj = $$('#frm1').serializeJSON();
+			obj.ids = persons.map(x=>x.usercode).join(',');
+			var cour = [];
+			var cobj = {};
+			cobj.courseId = obj.courseId;
+			cobj.usercode = obj.teacher;
+			cour.push(cobj);
+			obj.courseList = cour;
+			obj.type = 0;
+			if(obj.teacher==''){
+				mui.toast('请选择培训讲师!')
+				return false;
+			}
+			if(obj.courseId==''){
+				mui.toast('请选择培训课程!')
+				return false;
+			}
+			
+			if(obj.beginDate==''){
+				mui.toast('请选择开始日期!')
+				return false;
+			}
+			
+			if(obj.endDate==''){
+				mui.toast('请选择结束日期!')
+				return false;
+			}
+			
+			if(obj.ids==''){
+				mui.toast('请选择培训人员!')
+				return false;
+			}
+			
+			$.ajax('../train/create.do',{
+				data: obj,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					mui.toast(data.message);
+					if(data.flag)
+						location.reload();
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+		
+		$$('#btnOk1').on('tap',function(){
+			var obj = $$('#frm3').serializeJSON();
+			obj.ids = persons.map(x=>x.usercode).join(',');
+			var cour = [];
+			var flag = true;
+			courseList.forEach(x=>{
+				x.courseId=x.id;
+				if(obj['shifu'+x.id]==undefined || obj['shifu'+x.id]==''){
+					flag = false;
+				}
+				x.usercode=obj['shifu'+x.id];
+			});
+			if(!flag){
+				mui.toast('请选择指导师傅!')
+				return false;
+			}
+			obj.courseList = courseList;
+			obj.type = 1;
+			if(obj.postionId==''){
+				mui.toast('请选择培训岗位!')
+				return false;
+			}
+			
+			if(courseList.length==0){
+				mui.toast('请选择培训课程!')
+				return false;
+			}
+			
+			if(obj.beginDate==''){
+				mui.toast('请选择开始日期!')
+				return false;
+			}
+			
+			if(obj.endDate==''){
+				mui.toast('请选择结束日期!')
+				return false;
+			}
+			
+			if(obj.ids==''){
+				mui.toast('请选择培训人员!')
+				return false;
+			}
+			
+			$.ajax('../train/createI.do',{
+				data: obj,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					mui.toast(data.message);
+					if(data.flag)
+						location.reload();
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+		
+		$$('.datepicker').on('tap',function(e){
+			var el = $$(this).siblings('input');
+			var dtpicker = new mui.DtPicker({
+			    type: 'date'
+			})
+			dtpicker.show(function(e) {
+			   	el.val(e.text);
+				dtpicker.dispose();
+			})
+		});
+		$.ajax('../course/queryList.do?type=0',{
+			dataType:'json',
+			type:'post',
+			timeout:45000,
+			headers:{'Content-Type':'application/json'},              
+			success:function(data){
+				data.data.forEach(function(e){
+					$$('#courseId').append('<option value="'+e.id+'">'+e.name+'</option>')
+				})
+			},
+			error:function(xhr,type,errorThrown){
+				mui.toast('网络错误');
+			}
+		});
+		var param = {};
+		param.level = '二级';
+		$.ajax('../department/queryClass2.do',{
+			dataType:'json',
+			data:param,
+			type:'post',
+			timeout:45000,
+			headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+			success:function(data){
+				data.data.forEach(function(e){
+					$$('[name=department]').append('<option value="'+e.code+'">'+e.name+'</option>');
+				});
+			},
+			error:function(xhr,type,errorThrown){
+				mui.toast('网络错误');
+			}
+		});
+		$$('[name=workShop]').change(function(){
+			var pid = $$(this).children('option:selected').val();
+			if(pid!=0){
+				_departmentId = pid;
+			}
+			if($$(this).attr('id')=='workShopId'){
+				$.ajax('../department/queryClass2.do',{
+					dataType:'json',
+					data:{parentId:pid},
+					type:'post',
+					timeout:45000,
+					headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+					success:function(data){
+						$$('#workGroup').find("option").not(":first").remove();
+						data.data.forEach(function(e){
+							$$('[name=workGroup]').append('<option value="'+e.code+'">'+e.name+'</option>');
+						});
+					},
+					error:function(xhr,type,errorThrown){
+						mui.toast('网络错误');
+					}
+				});
+			}
+			$.ajax('../position/queryList.do',{
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				data:{workGroupId:0,deptId:pid},
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					$$('#postionId').find("option").not(":first").remove();
+					data.data.forEach(function(e){
+						$$('#postionId').append('<option value="'+e.id+'">'+e.name+'</option>')
+					})
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+		$$('#workGroup').change(function(){
+			var pid = $$(this).children('option:selected').val();
+			$.ajax('../position/queryList.do',{
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				data:{workGroupId:pid},
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					$$('#postionId').find("option").not(":first").remove();
+					data.data.forEach(function(e){
+						$$('#postionId').append('<option value="'+e.id+'">'+e.name+'</option>')
+					})
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+		$$('[name=department]').change(function(){  
+			var pid = $$(this).children('option:selected').val();
+			if(pid!=0){
+				_departmentId = pid;
+			}
+			$.ajax('../department/queryClass2.do',{
+				dataType:'json',
+				data:{parentId:pid},
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					$$('#workShop').find("option").not(":first").remove();
+					$$('#workShopId').find("option").not(":first").remove();
+					data.data.forEach(function(e){
+						$$('[name=workShop]').append('<option value="'+e.code+'">'+e.name+'</option>');
+					});
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});  
+		var persons = [];
+		
+		window.addEventListener("pageflowrefresh", function (e) {
+		    location.reload();
+		});
+		
+		window.addEventListener("showuser", function (param) {
+			$$('#btn1').focus();
+			persons = param.detail.data;
+			$$('#'+param.detail.id).html('<label style="width:auto;padding-left:130px;line-height: 28px;">'+
+					param.detail.data.map(x=>x.name).join()+'</label>');
+			checkuser.style.display = "none";
+		});
+		$$('.xzr').on('tap',function(){
+			var id = $$(this).attr('targe');
+			var url = 'selectuser.html?id='+id+'&departmentId='+_departmentId;
+			checkuser.src = url;
+			checkuser.style.display = "block";
+			checkuser.style.zIndex = 9999;
+			//$('#popoverr').popover('show',doc.getElementById("btn1"));
+		});
+		var _departmentId = 0;
+		$.ajax('../train/queryUserbypostion.do',{
+			dataType:'json',
+			type:'post',
+			timeout:45000,
+			headers:{'Content-Type':'application/json'},              
+			success:function(data){
+				data.data.forEach(function(e){
+					$$('#teacher').append('<option value="'+e.usercode+'">'+e.name+'</option>');
+				});
+				scroll.reLayout();
+			},
+			error:function(xhr,type,errorThrown){
+				mui.toast('网络错误');
+			}
+		});
+	}(mui, document, jQuery));
+	</script>
+</html>

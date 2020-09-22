@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>开始测试</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/app.css"/>
+		<link href="css/css.css" rel="stylesheet" />
+		<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+			.aaa{
+				padding:5px 15px;
+			}
+			.abc{
+				margin:5px 25px;
+			}
+			.xx{
+				padding-top:5px;
+				padding-left:10px;
+			}
+		</style>
+		<script>
+			localStorage.setItem('testPageLoadOk','ok');
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">开始测试</h1>
+		</header>
+		<div class="mui-content">
+			<form id="data" class="mui-table-view-cell">
+			<input type="hidden" th:value="${exam.code}" name="code"/>
+			<h4>一、填空题</h4>
+			<div class="abc tiankong" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+		          <h4 
+		          	th:each="item,userStat : ${papers}" 
+		          	th:if="${item.question.type} eq '填空题'"
+		          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}"
+		          	th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content
+		          	+'('+item.score+'分,得分'+item.score1+')<br/>正确答案:'+item.question.answer+'<br/>测试答案:'+(item.answer==null?'':item.answer)+'<br/>'}">
+		          </h4>
+			</div>
+			<h4>二、单选题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+			    <div th:each="item,userStat : ${papers}" 
+	          	th:if="${item.question.type} eq '单选题'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content+'('+item.score+'分,得分'+item.score1+')'}"></h4>
+	          		<h4 th:utext="${'选项:'+item.question.selections}"></h4>
+	          		<h4 th:utext="${'正确答案:'+(item.question.answer==null?'':item.question.answer)}"></h4>
+					<h4 th:utext="${'测试答案:'+(item.answer==null?'':item.answer)}"></h4>	
+         		</div>
+			</div>
+			<h4>三、多选题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}" 
+		          	th:if="${item.question.type} eq '多选题'"
+		          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		        	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content+'('+item.score+'分,得分'+item.score1+')'}"></h4>
+          		  	<h4 th:utext="${'选项:'+item.question.selections}"></h4>
+	          		<h4 th:utext="${'正确答案:'+(item.question.answer==null?'':item.question.answer)}"></h4>
+					<h4 th:utext="${'测试答案:'+(item.answer==null?'':item.answer)}"></h4>	
+				</div>
+			</div>
+			<h4>四、判断题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}" 
+	          	th:if="${item.question.type} eq '判断题'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content+'('+item.score+'分,得分'+item.score1+')'}"></h4>
+          			<h4 th:utext="${'参考答案:'+(item.question.answer==null?'':item.question.answer)}"></h4>
+					<h4 th:utext="${'测试答案:'+(item.answer==null?'':item.answer)}"></h4>
+         		</div>
+			</div>   
+			<h4>五、简答题</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}" 
+	          	th:if="${item.question.type} eq '简答题'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content+'('+item.score+'分,得分'+item.score1+')'}"></h4>
+					<h4 th:utext="${'参考答案:'+(item.question.answer==null?'':item.question.answer)}"></h4>
+					<h4 th:utext="${'测试答案:'+(item.answer==null?'':item.answer)}"></h4>
+         		</div>
+			</div>
+			
+			<h4>理论考核项目</h4>
+			<div class="abc" th:with="index=${#httpServletRequest.setAttribute('index',0)}">
+				<div th:each="item,userStat : ${papers}" 
+	          	th:if="${item.question.type} eq '理论考核项目'"
+	          	th:with="index=${#httpServletRequest.setAttribute('index',#httpServletRequest.getAttribute('index')+1)}">
+		          	<h4 th:utext="${#httpServletRequest.getAttribute('index')+'.'+item.question.content+'(得分'+item.score1+')'}"></h4>
+					<h4 th:utext="${'参考答案:'+(item.question.answer==null?'':item.question.answer)}"></h4>
+					<h4 th:utext="${'测试答案:'+(item.answer==null?'':item.answer)}"></h4>
+         		</div>
+			</div>
+			</form>    
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="js/loading.js"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script src="../plugins/jquery/jquery.serializejson.js"></script>
+	<script>
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:false
+		});
+		/* window.addEventListener("pageflowrefresh", function (e) {
+		    location.reload();
+		}); */
+		$$('#submit').on('tap',function(e){
+			var obj = $$("#data").serializeJSON();
+			for(var key in obj){
+				if($$('input:checkbox[name='+key+']:checked').length>0){
+					var arr = new Array();
+					$$('input:checkbox[name='+key+']:checked').each(function(i){
+						arr[i] = $$(this).val().trim();
+					});
+					 obj[key] = arr.join("");
+				}
+			}
+			mui.showLoading('正在提交...');
+			$.ajax('../exam/savePaper.do',{
+				data: obj,					
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},	              
+				success:function(data){
+					mui.hideLoading();
+					mui.toast(data.message);
+					if(data.flag){
+						window.location.replace(document.referrer);
+					}
+				},
+				error:function(xhr,type,errorThrown){
+					mui.hideLoading();
+					mui.toast('网络错误');
+				}
+			});
+		});
+	}(mui, document, jQuery));
+	</script>
+</html>

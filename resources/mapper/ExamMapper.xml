@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Exam">
+	<resultMap type="com.netcity.module.entity.ExamEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="code" property="code" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<!-- <result column="status" property="status" /> -->
+		<result column="passrate" property="passrate" />
+		<result column="examtime" property="examtime" />
+		<result column="ispass" property="ispass" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_exam
+	</sql>
+	<sql id="BASE_COLUMNS">
+		id,
+		code,
+		createUser,
+		createDate,
+		passrate,
+		examtime,
+		type,
+		positionId,
+		ispass,
+		ifnull(totalScore,0) as totalScore,
+		beginDate,
+		endDate
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="code!=null and code !=''">
+				and a.code = #{code}
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and a.createUser = #{createUser}
+			</if>
+			<if test="createDate!=null ">
+				and a.createDate = #{createDate}
+			</if>
+			<!-- <if test="status!=null ">
+				and a.status = #{status}
+			</if> -->
+			<if test="type !=null ">
+				and a.type = #{type}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.ExamEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.ExamEntity" parameterType="com.netcity.module.entity.ExamEntity">
+		select
+			a.id,
+			a.code,
+			a.createUser,
+			a.createDate,
+			a.beginDate,
+			a.endDate,
+			a.passrate,
+			a.type,
+			a.positionId,
+			a.ispass
+		from
+			ex_exam a
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.ExamEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.ExamEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="code !=null">
+				code=#{code},
+			</if>
+			<if test="ispass !=null">
+				ispass=#{ispass},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+			<!-- <if test="status !=null">
+				status=#{status},
+			</if> -->
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.ExamEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			 code
+			,createUser
+			,createDate
+			,beginDate
+			,endDate
+			,examtime
+			,passrate
+			,type
+			,trainId
+			,positionId
+			,totalScore
+		)
+		values (
+			 #{code}
+			,#{createUser}
+			,now()
+			,#{beginDate}
+			,#{endDate}
+			,#{examtime}
+			,#{passrate}
+			,#{type}
+			,#{trainId}
+			,#{positionId}
+			,#{totalScore}
+		)
+	</insert>
+
+	<update id="updateByIds" parameterType="com.netcity.module.entity.ExamEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="state1!=null">
+				state1 = #{state1},
+			</if>
+			<if test="updateUser !=null">
+				updateUser=#{updateUser},
+			</if>
+			<if test="updateDate !=null">
+				updateDate=#{updateDate},
+			</if>
+		</trim>
+		where id in (${ids})
+	</update>
+
+
+</mapper>

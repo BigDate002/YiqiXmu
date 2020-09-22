@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<!-- <link rel="stylesheet" type="text/css" href="../css/iconfont.css"/> -->
+		<link href="css/css.css" rel="stylesheet" />
+		<style>
+			body{
+				background: #ffffff!important;
+			}
+			ul {
+				font-size: 14px;
+				color: #8f8f94;
+			}
+			.mui-grid-view.mui-grid-9{
+				background: #ffffff!important;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+
+			.mui-grid-view.mui-grid-9 .mui-media {
+				color: blue;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<h1 class="mui-title">人员资质管理平台1</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content">
+			<div class="mui-index-title">
+			<span id="glpt">管理平台</span>
+			<ul class="mui-table-view mui-grid-view mui-grid-9" id="a1">
+				<li shiro:hasPermission="17" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="train" data-href="train.html">
+						<div class="ap-btn ap-btn-pxzx"></div>
+						<div class="mui-media-body mui-ico-font">培训中心</div>
+					</a></li>
+
+				<li shiro:hasPermission="18" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="ceshi" data-href="ceshi.html">
+						<div class="ap-btn ap-btn-cszx"></div>
+						<div class="mui-media-body mui-ico-font">测试中心</div>
+					</a></li>
+
+				<li shiro:hasPermission="19" class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="zizhi" data-href="zizhi.html">
+						<div class="ap-btn ap-btn-ryzz"></div>
+						<div class="mui-media-body mui-ico-font">人员资质</div>
+					</a></li>
+			</ul>
+			<span>个人中心</span>
+			<ul class="mui-table-view mui-grid-view mui-grid-9" style="margin-bottom: 80px;">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="mytrain1" data-href="mytrain1.html">
+						<div class="ap-btn ap-btn-dpx"><span class="mui-badge" th:text="${n1}"></span></div>
+						<div class="mui-media-body mui-ico-font">待培训</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="mytrain2" data-href="mytrain2.html">
+						<div class="ap-btn ap-btn-ypx"><span class="mui-badge" th:text="${n2}"></span></div>
+						<div class="mui-media-body mui-ico-font">已培训</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="test1" data-href="test1.html">
+						<div class="ap-btn ap-btn-dcs"><span class="mui-badge" th:text="${m1}"></span></div>
+						<div class="mui-media-body mui-ico-font">待测试</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="test2" data-href="test2.html">
+						<div class="ap-btn ap-btn-ycs"><span class="mui-badge" th:text="${m2}"></span></div>
+						<div class="mui-media-body mui-ico-font">已测试</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="qualify" data-href="qualify.html">
+						<div class="ap-btn ap-btn-wdzz"></div>
+						<div class="mui-media-body mui-ico-font">我的资质</div>
+					</a></li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="userinfo" data-href="userinfo.html">
+						<div class="ap-btn ap-btn-wdxx"></div>
+						<div class="mui-media-body mui-ico-font">我的信息</div>
+					</a></li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a class="mlink" data-id="editpwd" data-href="editpwd.html">
+						<div class="ap-btn ap-btn-xgmm"></div>
+						<div class="mui-media-body mui-ico-font">密码修改</div>
+					</a></li>
+			</ul>
+			<div style="background: #fff;width: 100%;position:fixed;bottom:0px;height: 65px;">
+				<div class="mui-content-padded" style="position:fixed;width:95%;bottom:0px;background: #ffffff;">
+					<button id='exit' class="mui-btn mui-btn-block mui-btn-blue">注销</button>
+				</div>
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+		<script>
+			(function($, doc,$$) {
+				$.init({
+					swipeBack:true
+				});
+				if($$("#a1").find("li").length==0){
+					$$('#glpt').hide();
+				}
+				var account = doc.getElementById('account');
+				$$('.mlink').on('tap',function(e){
+					window.location = $$(this).attr('data-href');
+				});
+				window.addEventListener("swipedown",function(){
+					location.reload();
+				});
+				$.ready(function() {
+					var exitButton = doc.getElementById('exit');
+					exitButton.addEventListener('tap',function(event){
+						$$.ajax('logout.do',{
+							type:'GET',
+							timeout:45000,
+							headers:{'Content-Type':'text/html'},	              
+							success:function(data){
+								if(data.flag||data.message=='登录认证失效，请重新登录!'){
+									location.reload();
+								}else{
+									mui.toast(data.message);
+								}
+							},
+							error:function(xhr,type,errorThrown){
+								mui.toast('网络错误');
+							}
+						});
+					});
+					$.oldBack = mui.back;
+					var backButtonPress = 0;
+				});
+				window.addEventListener("pageflowrefresh", function (e) {
+				    location.reload();
+				});
+			}(mui, document, jQuery));
+		</script>
+	</body>
+
+</html>

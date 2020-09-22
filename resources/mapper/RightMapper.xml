@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Right">
+	<resultMap type="com.netcity.module.entity.RightEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="code" property="code" />
+		<result column="name" property="name" />
+		<result column="columnId" property="columnId" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_right
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			id,
+			code,
+			name,
+			columnId,
+			createUser,
+			createDate,
+			exists(select 0 from ex_role_right where
+			rightId=ex_right.id and roleId=#{roleId}) as checked
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="code!=null">
+				and code = #{code}
+			</if>
+			<if test="name!=null">
+				and name = #{name}
+			</if>
+			<if test="columnId!=null">
+				and columnId = #{columnId}
+			</if>
+			<if test="createUser!=null">
+				and createUser = #{createUser}
+			</if>
+			<if test="createDate!=null">
+				and createDate = #{createDate}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.RightEntity"
+		parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.RightEntity"
+		parameterType="com.netcity.module.entity.RightEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.RightEntity"
+		parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.RightEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="code !=null">
+				code=#{code},
+			</if>
+			<if test="name !=null">
+				name=#{name},
+			</if>
+			<if test="columnId !=null">
+				columnId=#{columnId},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where roleId = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.RightEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		<trim suffixOverrides=","> code,
+			name,
+			columnId,
+			createUser,
+			createDate,
+		</trim>
+		)
+		values (
+		<trim suffixOverrides=",">
+			#{code},
+			#{name},
+			#{columnId},
+			#{createUser},
+			#{createDate},
+		</trim>
+		)
+	</insert>
+</mapper>

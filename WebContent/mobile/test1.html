@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>待测试</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/app.css"/>
+		<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+		<link href="css/css.css" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+		</style>
+	<script>
+		localStorage.setItem('pageLoadOk','ok');
+	</script>	
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">待测试</h1>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell" th:each="item,userStat : ${list}">
+					<span class="mui-line-height mui-font1" th:text="${'类型:'+(item.postionName!=null?'资质培训':'通用培训')}"></span>
+					<span class="mui-line-height mui-font2" th:if="${item.postionName!=null}" th:text="${'岗位:'+item.postionName}"></span>
+					<span class="mui-line-height mui-font2" th:text="${'课程:'+item.courseName}"></span>
+					<p class='mui-ellipsis mui-font4' th:text="${'起止日期:从'+#dates.format(item.exam.beginDate, 'yyyy年MM月dd日')+'到'+#dates.format(item.exam.endDate, 'yyyy年MM月dd日')}"></p>
+					<p class="mui-mt10">
+					<button type="button" th:attr="data-id=${item.getExam().getId()}" class="mui-btn-s mui-btn-primary mybtn">开始测试</button>
+					</p>
+				</li>
+			</ul>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script src="js/loading.js"></script>
+	<script>
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		window.addEventListener("pageflowrefresh", function (e) {
+		    location.reload();
+		});
+		$$('.mybtn').on('tap',function(e){
+			var timer = setTimeout(function(){
+				mui.hideLoading();
+			},30000);
+			mui.showLoading('正在跳转...');
+			var id = $$(this).attr('data-id');
+			window.location = 'test.html?id='+id;
+		});
+		setInterval(function(){
+			if(localStorage.getItem('testPageLoadOk')==='ok'){
+				mui.hideLoading();
+				localStorage.removeItem('testPageLoadOk');
+			}
+		},500);
+	}(mui, document, jQuery));
+	</script>
+</html>

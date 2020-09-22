@@ -1,0 +1,50 @@
+
+.layui-layout-admin .layui-side{
+	top: 0!important;
+}
+.layui-side:nth-child(1) .layui-side-scroll{
+	height: calc(100% - 130px);
+}
+.layui-side:nth-child(2) .layui-side-scroll{
+	height: calc(100% - 44px);
+}
+.layui-nav-tree .layui-nav-item a{
+	background: #2f4056;
+}
+dl dd a{
+	background: #011128!important;
+}
+.layui-nav-tree .layui-nav-child dd.layui-this, .layui-nav-tree .layui-nav-child dd.layui-this a, .layui-nav-tree .layui-this, .layui-nav-tree .layui-this>a, .layui-nav-tree .layui-this>a:hover {
+    background-color: #009688!important;
+}
+.layui-side:nth-child(2) .layui-nav-tree .layui-nav-item a {
+    background: #f5f5f5;
+	color: #061b39!important;
+	border-bottom: 1px solid #E5E5E5;
+}
+.layui-side:nth-child(2) .layui-this>a {
+    background-color: #F2F2F2!important;
+}
+.layui-icon-ok{
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 0;
+	height: 0;
+	border: 10px solid #ff5722;
+	border-bottom: 10px solid transparent;
+	border-left: 10px solid transparent;
+}
+.layui-icon-ok:before{
+    right: -10px;
+    position: absolute;
+    top: -26px;
+    font-size: 12px;
+}
+
+.layui-footer {
+	margin-left: -20px;
+}
+.layui-nav-tree .layui-nav-bar {
+    width: 0px;
+}

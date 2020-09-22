@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.CoursePosition">
+	<resultMap type="com.netcity.module.entity.CoursePositionEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="courseId" property="courseId" />
+		<result column="positionId" property="positionId" />
+		<association property="position" javaType="com.netcity.module.entity.PositionEntity">
+			<result column="positionId" property="id" />
+			<result column="type" property="type" />
+			<result column="name" property="name" />
+			<result column="examPeriod" property="examPeriod" />
+			<result column="remark" property="remark" />
+		</association>
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_course_position
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			a.id,
+			a.courseId,
+			a.positionId,
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="courseId!=null ">
+				and a.courseId = #{courseId}
+			</if>
+			<if test="positionId!=null ">
+				and a.positionId = #{positionId}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.CoursePositionEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		a
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultMap="BookResultMap" parameterType="com.netcity.module.entity.CoursePositionEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		,b.type
+		,b.name
+		,b.examPeriod
+		,b.remark
+		from
+		<include refid="TABLE_NAME"></include>
+		a
+		join ex_position b on a.positionId=b.id
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.CoursePositionEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		a
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.CoursePositionEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="courseId !=null">
+				courseId=#{courseId},
+			</if>
+			<if test="positionId !=null">
+				positionId=#{positionId},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where courseId = #{id}
+	</delete>
+	<delete id="deleteById2" parameterType="java.util.List">
+		<foreach collection="list" item="i" index="index" separator=";">
+			delete from
+			<include refid="TABLE_NAME"></include>
+			where courseId =#{i.courseId} and positionId=#{i.positionId}
+		</foreach>
+	</delete>
+	<insert id="insert" parameterType="com.netcity.module.entity.CoursePositionEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		<trim suffixOverrides=","> courseId,
+			positionId,
+		</trim>
+		)
+		values (
+		<trim suffixOverrides=",">
+			#{courseId},
+			#{positionId},
+		</trim>
+		)
+	</insert>
+	<insert id="insertBatchOnce" parameterType="java.util.List">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		<trim suffixOverrides=","> courseId,
+			positionId,
+		</trim>
+		)
+		values 
+		<foreach collection="list" item="i" separator=",">
+		(
+		<trim suffixOverrides=",">
+			#{i.courseId},
+			#{i.positionId},
+		</trim>
+		)
+		</foreach>
+	</insert>
+</mapper>

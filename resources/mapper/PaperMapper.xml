@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Paper">
+	<resultMap type="com.netcity.module.entity.PaperEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="code" property="code" />
+		<result column="questionId" property="questionId" />
+		<result column="answer" property="answer" />
+		<result column="userCode" property="userCode" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<result column="updateUser" property="updateUser" />
+		<result column="updateDate" property="updateDate" />
+		<result column="score" property="score" />
+		<result column="score1" property="score1" />
+		<!-- <association property="question" column="questionId" select="selectQuestion"></association> -->
+		<association property="question" javaType="com.netcity.module.entity.QuestionEntity">
+			<result property="selections" column="selections" />
+			<result property="content" column="content" />
+			<result property="answer" column="answer1" />
+			<result property="type" column="type" />
+		</association>
+	</resultMap>
+	<select id="selectQuestion" resultType="com.netcity.module.entity.QuestionEntity">
+		SELECT * FROM EX_QUESTION WHERE ID=#{questionId}
+	</select>
+	<sql id="TABLE_NAME">
+		ex_paper
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			id,
+			code,
+			questionId,
+			answer,
+			userCode,
+			createUser,
+			createDate,
+			updateUser,
+			updateDate,
+			score,
+			score1
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="code!=null and code !=''">
+				and code = #{code}
+			</if>
+			<if test="questionId!=null ">
+				and questionId = #{questionId}
+			</if>
+			<if test="answer!=null and answer !=''">
+				and answer = #{answer}
+			</if>
+			<if test="userCode!=null and userCode !=''">
+				and userCode = #{userCode}
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and createUser = #{createUser}
+			</if>
+			<if test="createDate!=null ">
+				and createDate = #{createDate}
+			</if>
+			<if test="updateUser !=null and updateUser !=''">
+				and createUser = #{createUser}
+			</if>
+			<if test="updateDate !=null ">
+				and updateDate = #{updateDate}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultMap="BookResultMap" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultMap="BookResultMap" parameterType="com.netcity.module.entity.PaperEntity">
+		select
+			a.id,
+			a.code,
+			a.questionId,
+			a.answer,
+			a.userCode,
+			a.createUser,
+			a.createDate,
+			a.updateUser,
+			a.updateDate,
+			a.score,
+			a.score1,
+			b.type,
+			trim(b.answer) as answer1,
+			b.selections,
+			b.content
+		from
+		<include refid="TABLE_NAME"></include> a
+		join ex_question b on a.questionId = b.id
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultMap="BookResultMap" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+		order by id
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.PaperEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="code !=null">
+				code=#{code},
+			</if>
+			<if test="questionId !=null">
+				questionId=#{questionId},
+			</if>
+			<if test="answer !=null">
+				answer=#{answer},
+			</if>
+			<if test="userCode !=null">
+				userCode=#{userCode},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+			<if test="updateUser !=null">
+				updateUser=#{updateUser},
+			</if>
+			<if test="updateDate !=null">
+				updateDate=#{updateDate},
+			</if>
+			<if test="score1 !=null">
+				score1 = #{score1},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.PaperEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		code,
+		questionId,
+		answer,
+		userCode,
+		createUser,
+		createDate,
+		score
+		)
+		values (
+		#{code},
+		#{questionId},
+		#{answer},
+		#{userCode},
+		#{createUser},
+		now(),
+		#{score}
+		)
+	</insert>
+</mapper>

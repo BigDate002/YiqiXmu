@@ -1,0 +1,185 @@
+body {
+	background: #f6f6f6!important;
+	font-size: 16px!important;
+	color: #191F25!important;
+}
+.mui-grid-view.mui-grid-9,.mui-content{
+	background: #f6f6f6!important;
+}
+.mui-grid-view.mui-grid-9 .mui-media {
+    color: #3296fa!important;
+	}
+.mui-btn-block{
+	margin-bottom: 6px!important;
+}
+.mui-content>.mui-table-view:first-child {
+    margin-top: 0!important;
+}
+.mui-btn-blue, .mui-btn-primary, input[type=submit] {
+    color: #fff;
+    border: 1px solid #3296fa;
+    background-color: #3296fa;
+}
+/* .mui-table-view-cell span{
+	line-height: 34px;
+	display: block;
+} */
+.mui-ellipsis{
+	line-height: 24px;
+}
+.mui-line-height{
+	line-height: 30px;
+	display: block;
+}
+.mui-input-row select {
+	height: 57px;
+	font-size: 16px;
+}
+.mui-h57{
+	height: 57px!important;
+}
+.mui-h67{
+	height: 67px!important;
+}
+.mui-btn-white{
+    color: #3296fa;
+    border: 1px solid #3296fa;
+    background-color: #ffffff;
+}
+/*首页*/
+.mui-ico-font{
+	font-size: 14px!important;
+	/* color: #3296fa!important; */
+}
+.mui-index-title{
+    margin: 0 auto;
+}
+.mui-index-title span{
+	margin: 10px 15px;
+	display: inline-block;
+}
+.mui-grid-view.mui-grid-9 .mui-table-view-cell{
+	border: 0;
+	padding: 0 12px;
+}
+.mui-grid-view.mui-grid-9{
+	border: 0;
+}
+.mui-body{
+	margin: 0 auto;
+}
+.mui-line{
+	height: 15px;
+	background: #f6f6f6;
+/* 	border-bottom: 1px solid #e3e4e4;
+	border-top: 1px solid #e3e4e4; */
+}
+
+.ap-btn{
+	height: 75px;
+	width: 75px;
+	border-radius: 5px;
+	border: none;
+	margin: 0 auto!important;
+}
+
+.ap-btn-pxzx{
+	background:#108ee9 url("../images/icon-sprite.png") no-repeat 0 0;
+}
+
+.ap-btn-cszx{
+	background:#e8541e url("../images/icon-sprite.png") no-repeat -75px 0;
+}
+.ap-btn-ryzz{
+	background:#f4333c url("../images/icon-sprite.png") no-repeat -150px 0;
+}
+.ap-btn-dpx{
+	background:#f7b197 url("../images/icon-sprite.png") no-repeat 0 -75px;
+}
+.ap-btn-ypx{
+	background:#2db5aa url("../images/icon-sprite.png") no-repeat -75px -75px;
+}
+.ap-btn-dcs{
+	background:#0b71ba url("../images/icon-sprite.png") no-repeat -150px -75px;
+}
+.ap-btn-ycs{
+	background:#e8a010 url("../images/icon-sprite.png") no-repeat -225px -75px;
+}
+.ap-btn-wdzz{
+	background:#68b9f2 url("../images/icon-sprite.png") no-repeat 0 -150px;
+}
+.ap-btn-wdxx{
+	background:#f29472 url("../images/icon-sprite.png") no-repeat -75px -150px;
+}
+.ap-btn-xgmm{
+	background:#0ba194 url("../images/icon-sprite.png") no-repeat -150px -150px;
+}
+
+.ap-btn .mui-badge {
+    font-size: 10px;
+    line-height: 1.4;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 1px 5px;
+    color: #fff;
+    background: red;
+}
+
+/*边距*/
+.mui-mt5{
+	margin-top: 5px;
+}
+.mui-mt10{
+	margin-top: 10px;
+}
+.mui-mr5{
+	margin-right: 5px;
+}
+.mui-btn {
+    padding: 10px;
+}
+/* .mui-content-padded {
+    margin: 15px!important;
+} */
+/* .mui-media-body{
+	font-size: 14px!important;
+	color:#3296fa !important;
+} */
+/*字体大小*/
+.mui-font1{
+	color: #191f25;
+	font-weight:bold;
+}
+.mui-font2{
+	color: #595d62;
+}
+.mui-font3{
+	color: #7e8185;
+}
+.mui-font4{
+	color: #a3a5a8;
+}
+.mui-font5{
+	color: #bfc1c2;
+}
+.font16{
+	font-size: 16px;
+}
+/*分割线*/
+.mui-input-group .mui-input-row:after,.mui-table-view-cell:after {
+	background-color: #e3e4e4!important;
+}
+/*按钮*/
+.mui-btn-s{
+	padding: 3px 5px!important;
+}
+.mui-btn-jl{
+	width: 100px!important;
+	float: left!important;
+	margin: 10px 0 0 15px;
+}
+.mui-popover{
+	left:0!important;
+}

@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>人员资质</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/app.css"/>
+		<link href="css/css.css" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" id="abc">人员资质</h1>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell mui-media" th:each="user,userStat : ${list}">
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" 
+						src="../images/mu.jpg">
+						<div class="mui-media-body" >
+							<span th:text="${'姓名:'+user.username+' 岗位:'+user.post}"></span>
+							<!-- <p class='mui-ellipsis' th:text="${'部门:'+user.department+' 科室/车间:'+user.workShop+' 班组:'+user.workGroup}"></p> -->
+							<p class='mui-ellipsis mui-font4' th:text="${'部门:'+user.department}"></p>
+							<p class='mui-ellipsis mui-font4' th:text="${'科室/车间:'+user.workShop}"></p>
+							<p th:if="${user.getWorkGroup()!=null}" class='mui-ellipsis mui-font4' th:text="${'班组:'+user.workGroup}"></p>
+							<p class='mui-ellipsis mui-font4' th:text="${'有效期:'+#dates.format(user.beginDate, 'yyyy年MM月dd日')+'到'+#dates.format(user.endDate, 'yyyy年MM月dd日')}"></p>
+							<p class="mui-mt5">
+							<button type="button" th:attr="data-id=${user.getId()}" class="mui-btn-s mui-btn-primary lookPic" >查看证书</button></p>
+						</div>
+					</a>
+				</li>
+			</ul>
+			</div>
+		</div>
+		<div id="popover" class="mui-popover" style="width: 100%">
+			<img width="100%" id="zizhi" />
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="js/mui.min.js"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script>
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		$.ready(function(){
+			var scroll = $(".mui-scroll-wrapper").scroll();
+		});
+		$('.mui-content').on('tap','.lookPic',function(){
+			var id = $$(this).attr('data-id');
+			$$('#zizhi').attr('src','../qualify/downloadimg.do?id='+id);
+			$('#popover').popover('show',doc.getElementById("abc"));
+		});
+	}(mui, document, jQuery));
+	</script>
+</html>

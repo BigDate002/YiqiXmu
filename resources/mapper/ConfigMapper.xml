@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Config">
+	<resultMap type="com.netcity.module.entity.ConfigEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="num1" property="num1" />
+		<result column="score1" property="score1" />
+		<result column="num2" property="num2" />
+		<result column="score2" property="score2" />
+		<result column="num3" property="num3" />
+		<result column="score3" property="score3" />
+		<result column="num4" property="num4" />
+		<result column="score4" property="score4" />
+		<result column="num5" property="num5" />
+		<result column="score5" property="score5" />
+		<result column="score6" property="score6" />
+		<result column="firstRate" property="firstRate" />
+		<result column="secondRate" property="secondRate" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_config
+	</sql>
+	<sql id="BASE_COLUMNS">
+		id,
+		num1,
+		score1,
+		num2,
+		score2,
+		num3,
+		score3,
+		num4,
+		score4,
+		num5,
+		score5,
+		firstRate,
+		secondRate,
+		createUser,
+		createDate
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="num1!=null ">
+				and num1 = #{num1}
+			</if>
+			<if test="score1!=null ">
+				and score1 = #{score1}
+			</if>
+			<if test="num2!=null ">
+				and num2 = #{num2}
+			</if>
+			<if test="score2!=null ">
+				and score2 = #{score2}
+			</if>
+			<if test="num3!=null ">
+				and num3 = #{num3}
+			</if>
+			<if test="score3!=null ">
+				and score3 = #{score3}
+			</if>
+			<if test="num4!=null ">
+				and num4 = #{num4}
+			</if>
+			<if test="score4!=null ">
+				and score4 = #{score4}
+			</if>
+			<if test="num5!=null ">
+				and num5 = #{num5}
+			</if>
+			<if test="score5!=null ">
+				and score5 = #{score5}
+			</if>
+			<if test="firstRate!=null ">
+				and firstRate = #{firstRate}
+			</if>
+			<if test="secondRate!=null ">
+				and secondRate = #{secondRate}
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and createUser = #{createUser}
+			</if>
+			<if test="createDate!=null ">
+				and createDate = #{createDate}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.ConfigEntity"
+		parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.ConfigEntity"
+		parameterType="com.netcity.module.entity.ConfigEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.ConfigEntity"
+		parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.ConfigEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		<set>
+			<if test="num1 !=null">
+				num1=#{num1},
+			</if>
+			<if test="score1 !=null">
+				score1=#{score1},
+			</if>
+			<if test="num2 !=null">
+				num2=#{num2},
+			</if>
+			<if test="score2 !=null">
+				score2=#{score2},
+			</if>
+			<if test="num3 !=null">
+				num3=#{num3},
+			</if>
+			<if test="score3 !=null">
+				score3=#{score3},
+			</if>
+			<if test="num4 !=null">
+				num4=#{num4},
+			</if>
+			<if test="score4 !=null">
+				score4=#{score4},
+			</if>
+			<if test="num5 !=null">
+				num5=#{num5},
+			</if>
+			<if test="score5 !=null">
+				score5=#{score5},
+			</if>
+			<if test="score6 !=null">
+				score6=#{score6},
+			</if>
+			<if test="firstRate !=null">
+				firstRate=#{firstRate},
+			</if>
+			<if test="secondRate !=null">
+				secondRate=#{secondRate},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.ConfigEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		<trim suffixOverrides=","> num1,
+			score1,
+			num2,
+			score2,
+			num3,
+			score3,
+			num4,
+			score4,
+			num5,
+			score5,
+			firstRate,
+			secondRate,
+			createUser,
+			createDate,
+		</trim>
+		)
+		values (
+		<trim suffixOverrides=",">
+			#{num1},
+			#{score1},
+			#{num2},
+			#{score2},
+			#{num3},
+			#{score3},
+			#{num4},
+			#{score4},
+			#{num5},
+			#{score5},
+			#{firstRate},
+			#{secondRate},
+			#{createUser},
+			now(),
+		</trim>
+		)
+	</insert>
+</mapper>

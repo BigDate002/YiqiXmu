@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Position">
+	<resultMap type="com.netcity.module.entity.PositionEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="deptId" property="deptId" />
+		<result column="examPeriod" property="examPeriod" />
+		<result column="remark" property="remark" />
+		<result column="createUser" property="createUser" />
+		<result column="updateUser" property="updateUser" />
+		<result column="department" property="department" />
+		<result column="departmentId" property="departmentId" />
+		<result column="workShop" property="workShop" />
+		<result column="state" property="state" />
+		<result column="workGroupId" property="workGroupId" />
+		<result column="workGroup" property="workGroup" />
+
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_position a
+	</sql>
+	<sql id="TABLE_NAME1">
+		ex_position
+	</sql>
+	<sql id="BASE_COLUMNS">
+		a.id,
+		a.name,
+		a.type,
+		a.deptId,
+		a.examPeriod,
+		a.remark,
+		a.createUser,
+		a.createDate,
+		a.state,
+		b.name as workShop,
+		c.name as department,
+		c.code as
+		departmentId,
+		a.workGroupId,
+		e.name as workGroup
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="state!=null">
+				and a.state = #{state}
+			</if>
+			<if test="name!=null and name !=''">
+				and a.name like concat('%',#{name},'%')
+			</if>
+			<if test="updateUser !=null and updateUser !=''">
+				and a.name = #{updateUser}
+			</if>
+			<if test="query !=null and query !=''">
+				and e.name = #{query}
+			</if>
+			<if test="workGroup !=null and workGroup !=''">
+				and e.name like concat('%',#{workGroup},'%')
+			</if>
+			<if test="type!=null">
+				and a.type = #{type}
+			</if>
+			<if test="deptId!=null ">
+				and a.deptId = #{deptId}
+			</if>
+			<if test="examPeriod!=null ">
+				and a.examPeriod = #{examPeriod}
+			</if>
+			<if test="remark!=null and remark !=''">
+				and a.remark = #{remark}
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and a.name = #{createUser}
+			</if>
+			<if test="createDate!=null ">
+				and a.createDate = #{createDate}
+			</if>
+			<if test="department !=null and department !=''">
+				and c.name like '${department}%'
+			</if>
+			<if test="departmentId !=null">
+				and (b.code=#{departmentId} or c.code=#{departmentId} or d.code=#{departmentId} or a.workGroupId=#{departmentId})
+			</if>
+			<if test="workShop !=null and workShop !=''">
+				and b.name like '${workShop}%'
+			</if>
+			<if test="workGroupId !=null and workGroupId ==0">
+				and workGroupId is null
+			</if>
+			<if test="workGroupId !=null and workGroupId !=0">
+				and workGroupId = #{workGroupId}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.PositionEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		join ex_department b on a.deptId = b.code
+		join ex_department c on b.parentId = c.code
+		join ex_department d on c.parentId = d.code
+		left join
+		ex_department e on e.code=a.workGroupId
+		where a.id = #{id}
+	</select>
+	<select id="selectByEntity" resultMap="BookResultMap" parameterType="com.netcity.module.entity.PositionEntity">
+		select
+		distinct
+		<include refid="BASE_COLUMNS"></include>
+		from
+		ex_position a
+		join ex_department b on a.deptId = b.code
+		join ex_department c on b.parentId = c.code
+		join ex_department d on c.parentId = d.code
+		left join ex_department e on e.code=a.workGroupId
+		<if test="roleId !=null ">
+			join ex_user_department z on z.roleId=#{roleId} and (a.deptId = z.deptId or a.workGroupId=z.deptId)
+		</if>
+		<if test="courseId !=null">
+			join ex_course_position on courseId = #{courseId} and a.id=positionId
+		</if>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.PositionEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.PositionEntity">
+		update
+		<include refid="TABLE_NAME1"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="name !=null">
+				name=#{name},
+			</if>
+			<if test="type !=null">
+				type=#{type},
+			</if>
+			<if test="deptId !=null">
+				deptId=#{deptId},
+			</if>
+			<if test="examPeriod !=null">
+				examPeriod=#{examPeriod},
+			</if>
+			<if test="remark !=null">
+				remark=#{remark},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+			<if test="updateUser !=null">
+				updateUser=#{updateUser},
+			</if>
+			<if test="state !=null">
+				state=#{state},
+			</if>
+			<if test="workGroupId !=null">
+				workGroupId=#{workGroupId},
+			</if>
+		</trim>
+		where
+		<if test="id!=null">
+			id = #{id}
+		</if>
+		<if test="ids!=null">
+			id in (${ids})
+		</if>
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.PositionEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME1"></include>
+		(
+		name,
+		type,
+		deptId,
+		examPeriod,
+		remark,
+		createUser,
+		createDate,
+		workGroupId
+		)
+		values (
+		#{name},
+		#{type},
+		#{deptId},
+		#{examPeriod},
+		#{remark},
+		#{createUser},
+		#{createDate},
+		#{workGroupId}
+		)
+	</insert>
+
+	<select id="selectDepartment" parameterType="com.netcity.module.entity.PositionEntity" resultType="java.lang.Long">
+		select a.code from ex_department a
+		join
+		ex_department b on a.parentId = b.code
+		join ex_department c on b.parentId = c.code
+		where a.name = #{workShop}
+		and b.name = #{department}
+		and
+		a.level='三级'
+	</select>
+
+	<select id="selectPositions" parameterType="com.netcity.module.entity.UserEntity" resultMap="BookResultMap">
+		select
+		a.id,
+		concat(c.name,'-',b.name,'-',ifnull(e.name,'null'),'-',a.name) as name,
+		group_concat(f.courseId) as ids
+		from ex_position a
+		join ex_department b on a.deptId = b.code
+		join ex_department c on b.parentId = c.code
+		join ex_department d on c.parentId = d.code
+		left join ex_department e on e.code=a.workGroupId
+		left join ex_course_position f on a.id=f.positionId
+		where a.state=1
+		and a.deptId in (select deptId from ex_user_department where roleId=#{id})
+		group by a.id
+	</select>
+
+	<select id="queryStaffData" parameterType="java.util.Map" resultType="com.netcity.module.entity.WorkerReserveVO">
+		select A.department,A.workShop,A.workGroup,A.username,A.usercode,B.postName,B.postType,C.keyPostCount,C.postCount from(
+			select
+			a.name as department,
+			b.name as workShop,
+			c.name as workGroup,
+			d.name as username,
+			d.usercode as usercode
+			from
+			ex_department tp
+			join ex_department a on a.parentId=tp.code and tp.level='一级'
+			join ex_department b on a.code=b.parentId
+			join ex_department c on b.code=c.parentId
+			join ex_user d on d.deptId=c.code
+			where ${where}.code=#{departmentId}
+			<if test="where1 !=null">
+			union all
+			select
+			a.name as department,
+			b.name as workShop,
+			'——' as workGroup,
+			d.name as username,
+			d.usercode as usercode
+			from
+			ex_department tp
+			join ex_department a on a.parentId=tp.code and tp.level='一级'
+			join ex_department b on a.code=b.parentId
+			join ex_user d on d.deptId=b.code
+			where ${where1}.code=#{departmentId}
+			</if>
+		) A
+		JOIN VIEW_POS B ON A.USERCODE=B.USERCODE
+		JOIN VIEW_USERPOSITION C ON A.USERCODE=C.USERCODE
+		ORDER BY A.DEPARTMENT,A.WORKSHOP,A.WORKGROUP,A.USERCODE
+		<if test="first!=null">
+			limit ${first},${limit}
+		</if>
+	</select>
+	<select id="queryStaffDataCount" parameterType="java.util.Map" resultType="java.lang.Long">
+		select count(*) from(
+			select
+			d.usercode
+			from
+			ex_department tp
+			join ex_department a on a.parentId=tp.code and tp.level='一级'
+			join ex_department b on a.code=b.parentId
+			join ex_department c on b.code=c.parentId
+			join ex_user d on d.deptId=c.code
+			where ${where}.code=#{departmentId}
+			<if test="where1 !=null">
+			union all
+			select
+			d.usercode
+			from
+			ex_department tp
+			join ex_department a on a.parentId=tp.code and tp.level='一级'
+			join ex_department b on a.code=b.parentId
+			join ex_user d on d.deptId=b.code
+			where ${where1}.code=#{departmentId}
+			</if>
+		)tm
+		JOIN VIEW_POS B ON TM.USERCODE=B.USERCODE
+	</select>
+	<select id="queryPositionData" parameterType="java.util.Map" resultType="com.netcity.module.entity.JobReserveVO">
+		<!-- select * from( -->
+		select f.*,
+		c.name as workGroup,
+		c.code as workGroupId,
+		d.name as username,
+		f.usercode as usercode,
+		g.postCount from(
+		select
+		a.name as department,
+		b.name as workShop,
+		a.code as departmentId,
+		b.code as workShopId,
+		e.id as postId,
+		e.name as postName,
+		e.type as postType,
+    	f.usercode as usercode
+		from
+		ex_department tp
+		join ex_department a on a.parentId=tp.code and tp.level='一级'
+		join ex_department b on a.code=b.parentId
+		join ex_position e on b.code=e.deptId and e.state=1
+		join ex_qualification f on f.postionId=e.id and f.endDate>sysdate()
+		left join ex_department c on e.workGroupId=c.code
+		where ${where}.code=#{departmentId}
+		<!-- )tm -->
+		order by a.code,b.code,e.id
+		<if test="first!=null">
+			limit ${first},${limit}
+		</if>
+		)f
+		join ex_user d on d.usercode=f.usercode
+		join ex_department c on d.deptId=c.code
+		join view_abcc g on g.postId=f.postId
+	</select>
+	<select id="queryPositionDataCount" parameterType="java.util.Map" resultType="java.lang.Long">
+		select
+		count(*)
+		from
+		ex_department tp
+		join ex_department a on a.parentId=tp.code and tp.level='一级'
+		join ex_department b on a.code=b.parentId
+		join ex_position e on b.code=e.deptId and e.state=1
+		join ex_qualification f on f.postionId=e.id and f.endDate>sysdate()
+		join ex_user d on d.usercode=f.usercode
+		left join ex_department c on e.workGroupId=c.code
+		<!-- join view_abcc g on g.postId=e.id -->
+		where ${where}.code=#{departmentId}
+	</select>
+	<select id="queryPositionList" parameterType="java.util.Map" resultType="com.netcity.module.entity.JobReserveVO">
+		select department,postCount,total,round(postCount*100/total) as rate from(
+		select 
+			${field} as department,
+			sum(case when postCount&gt;2 then 1 else 0 end) as postCount,
+			count(1) as total
+			from(
+			select 
+			  distinct
+			  a.name as department,
+			  b.name as workShop,
+			  a.code as departmentId,
+			  b.code as workShopId,
+			  c.name as workGroup,
+			  c.code as workGroupId,
+			  e.id as postId,
+			  e.name as postName,
+			  e.type as postType,
+			  f.postCount
+			from
+			ex_department tp 
+			join ex_department a on a.parentId=tp.code and tp.level='一级'
+			join ex_department b on a.code=b.parentId
+			join ex_department c on b.code=c.parentId
+			join ex_position e on c.code=e.workGroupId and e.state=1
+			left join view_abcc f on f.postId=e.id
+			where ${where}.code=#{departmentId}
+			<if test="where!='c'.toString()">
+			union all
+			select 
+			  distinct
+			  a.name as department,
+			  b.name as workShop,
+			  a.code as departmentId,
+			  b.code as workShopId,
+			  null as workGroup,
+			  null as workGroupId,
+			  e.id as postId,
+			  e.name as postName,
+			  e.type as postType,
+			  f.postCount
+			from
+			ex_department tp 
+			join ex_department a on a.parentId=tp.code and tp.level='一级'
+			join ex_department b on a.code=b.parentId
+			left join ex_position e on b.code=e.deptId and e.state=1 and e.workGroupId is null
+			join view_abcc f on f.postId=e.id
+			where ${where}.code=#{departmentId}
+			</if>
+		)tm
+		group by ${group}
+		) tm1
+		order by rate desc
+	</select>
+	<select id="queryStaffList" parameterType="java.util.Map" resultType="com.netcity.module.entity.JobReserveVO">
+		<![CDATA[
+		select username,postCount,total,round(postCount*100/total) as rate from(
+		select
+			${field} as username,
+			sum(case when postCount>2 and keyPostCount>0 then 1 else 0 end ) as postCount,
+			count(1) as total
+			from(
+			select 
+			  a.code as departmentId,
+			  b.code as workShopId,
+			  c.code as usercode,
+			  a.name as department,
+			  b.name as workShop,
+			  c.name as username,
+			  f.keyPostCount,
+			  f.postCount
+			from
+			ex_department tp 
+			join ex_department a on a.parentId=tp.code and tp.level='一级'
+			join ex_department b on a.code=b.parentId
+			join ex_department c on b.code=c.parentId
+			join ex_user d on d.deptId=c.code
+			join view_userposition f on d.usercode=f.usercode
+			where ${where}.code=#{departmentId}
+		)tm group by ${group}
+		)tm1 order by rate desc
+		]]>
+	</select>
+	<select id="selectUsers" parameterType="com.netcity.module.entity.UserEntity" resultType="java.lang.String">
+		select a.usercode
+		from ex_user a
+		<if test="id !=null ">
+			join ex_user_department z on z.roleId=#{id} and a.deptId = z.deptId
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.RoleDepartment">
+	<resultMap type="com.netcity.module.entity.RoleDepartmentEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="roleId" property="roleId" />
+		<result column="deptId" property="deptId" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_user_department
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			id,
+			roleId,
+			deptId,
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="roleId!=null ">
+				and roleId = #{roleId}
+			</if>
+			<if test="deptId!=null ">
+				and deptId = #{deptId}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.RoleDepartmentEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.RoleDepartmentEntity" parameterType="com.netcity.module.entity.RoleDepartmentEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.RoleDepartmentEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.RoleDepartmentEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="roleId !=null">
+				roleId=#{roleId},
+			</if>
+			<if test="deptId !=null">
+				deptId=#{deptId},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where roleId = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.RoleDepartmentEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		<trim suffixOverrides=","> roleId,
+			deptId,
+		</trim>
+		)
+		values (
+		<trim suffixOverrides=",">
+			#{roleId},
+			#{deptId},
+		</trim>
+		)
+	</insert>
+	
+	<insert id="insertBatchOnce" parameterType="java.util.List">
+		insert into <include refid="TABLE_NAME"></include>
+		(roleId,deptId) values
+		<foreach collection="list" item="item" separator=",">
+		(#{item.roleId},#{item.deptId})
+		</foreach>
+	</insert>
+</mapper>

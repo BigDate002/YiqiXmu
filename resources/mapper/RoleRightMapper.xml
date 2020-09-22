@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.RoleRight">
+	<resultMap type="com.netcity.module.entity.RoleRightEntity" id="BookResultMap">
+		<result column="id" property="id"/>
+		<result column="roleId" property="roleId"/>
+		<result column="rightId" property="rightId"/>
+		<result column="createUser" property="createUser"/>
+		<result column="createDate" property="createDate"/>
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_role_right
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+		id,
+					roleId,
+					rightId,
+					createUser,
+					createDate,
+				</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+    	<where>
+			<if test="id!=null">
+				and id = #{id}
+        	</if>
+			<if test="roleId!=null">
+				and roleId = #{roleId}
+			</if>
+			<if test="rightId!=null">
+				and rightId = #{rightId}
+			</if>
+			<if test="createUser!=null">
+				and createUser = #{createUser}
+			</if>
+			<if test="createDate!=null">
+				and createDate = #{createDate}
+			</if>
+		</where>
+    </sql>
+	<select id="selectById" resultType="com.netcity.module.entity.RoleRightEntity"
+		parameterType="java.lang.Long">
+		select <include refid="BASE_COLUMNS"></include> from <include refid="TABLE_NAME"></include> where id = #{id}
+    </select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.RoleRightEntity"
+		parameterType="com.netcity.module.entity.RoleRightEntity">
+		select <include refid="BASE_COLUMNS"></include> from <include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.RoleRightEntity"
+		parameterType="java.util.Map">
+		select <include refid="BASE_COLUMNS"></include> from <include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+    </select>
+	<update id="updateById" parameterType="com.netcity.module.entity.RoleRightEntity">
+		update <include refid="TABLE_NAME"></include> set
+		<trim suffixOverrides=",">
+							<if test="roleId !=null">
+					roleId=#{roleId},
+				</if>
+							<if test="rightId !=null">
+					rightId=#{rightId},
+				</if>
+							<if test="createUser !=null">
+					createUser=#{createUser},
+				</if>
+							<if test="createDate !=null">
+					createDate=#{createDate},
+				</if>
+					</trim>
+		where id = #{id}
+    </update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from <include refid="TABLE_NAME"></include> where roleId = #{id}
+    </delete>
+	
+	<insert id="insert" parameterType="com.netcity.module.entity.RoleRightEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into <include refid="TABLE_NAME"></include> 
+	(<trim suffixOverrides=",">		roleId,
+			rightId,
+			createUser,
+			createDate,
+	</trim>)
+    values (<trim suffixOverrides=",">
+				#{roleId},
+				#{rightId},
+				#{createUser},
+				now(),
+		</trim>)
+  </insert>
+</mapper>

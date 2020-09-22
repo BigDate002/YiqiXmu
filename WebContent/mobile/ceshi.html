@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>测试中心</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/app.css"/>
+		<link href="css/css.css" rel="stylesheet" />
+		<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+		</style>
+		<script>
+			localStorage.setItem('pageLoadOk','ok');
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a class="mui-icon mui-icon-search mui-pull-right mui-a-color" id="ss" style="font-size:15px;line-height:25px;">搜索</a>
+			<h1 class="mui-title">测试中心</h1><br/><br/>
+			<form id="searchFrm" class="mui-input-group" onsubmit="return aa()" style="display:none;margin-top:-1px;">
+				<div class="mui-input-row mui-select" style="height:1px;"></div>
+				<div class="mui-input-row mui-select">
+					<label>部门</label>
+					<select name="department" id="department">
+						<option value="0">请选择部门</option>
+					</select>
+				</div>
+				<div class="mui-input-row mui-select">
+					<label>科室/车间</label>
+					<select name="workShop" id="workShop">
+						<option value="0">请选择科室/车间</option>
+					</select>
+				</div>
+				<div class="mui-input-row mui-select">
+					<label>班组</label>
+					<select name="workGroup" id="workGroup">
+						<option value="0">请选择班组</option>
+					</select>
+				</div>
+				<div class="mui-input-row">
+					<label>工号或姓名</label>
+					<input type="text" id="search" placeholder="请输入工号或姓名" name="examtime" class="mui-input-clear" />
+					<a id='searchBtn' class="mui-icon mui-icon-search" style="font-size:15px;line-height:25px;position:fixed;right:10px;">查询</a>
+				</div>
+				<p style="padding-bottom:13px;"></p>
+			</form>
+		</header>
+		<div class="mui-content" style="padding-bottom:45px;">
+			<ul class="mui-table-view" id="uuu">
+			</ul>
+		</div>
+		<div style="position:fixed;width:100%; background:#fff; padding:8px 0; bottom:0; text-align:center;">
+			<ul id="pagination" class="mui-pagination"></ul>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="js/mui.picker.min.js"></script>
+	<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+	<script src="../plugins/jquery/jquery.serializejson.js"></script>
+	<script th:src="'js/loading.js?version='+${new java.util.Date().getTime()}"></script>
+	<script th:src="'js/pager.js?version='+${new java.util.Date().getTime()}"></script>
+	<script>
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		
+		var param = {};
+		param.level = '二级';
+		$.ajax('../department/queryClass2.do',{
+			dataType:'json',
+			data:param,
+			type:'post',
+			timeout:45000,
+			headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+			success:function(data){
+				data.data.forEach(function(e){
+					$$('[name=department]').append('<option value="'+e.code+'">'+e.name+'</option>');
+				});
+			},
+			error:function(xhr,type,errorThrown){
+				mui.toast('网络错误');
+			}
+		});
+		
+		$$('[name=department]').change(function(){  
+			var pid = $$(this).children('option:selected').val();
+			$.ajax('../department/queryClass2.do',{
+				dataType:'json',
+				data:{parentId:pid},
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					$$('#workShop').find("option").not(":first").remove();
+					$$('#workShopId').find("option").not(":first").remove();
+					data.data.forEach(function(e){
+						$$('[name=workShop]').append('<option value="'+e.code+'">'+e.name+'</option>');
+					});
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});  
+		
+		$$('[name=workShop]').change(function(){
+			var pid = $$(this).children('option:selected').val();
+			$.ajax('../department/queryClass2.do',{
+				dataType:'json',
+				data:{parentId:pid},
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/x-www-form-urlencoded'},              
+				success:function(data){
+					$$('#workGroup').find("option").not(":first").remove();
+					data.data.forEach(function(e){
+						$$('[name=workGroup]').append('<option value="'+e.code+'">'+e.name+'</option>');
+					});
+				},
+				error:function(xhr,type,errorThrown){
+					mui.toast('网络错误');
+				}
+			});
+		});
+		
+		var postMethod  = function(url,id){
+			$.ajax(url,{
+				data:JSON.stringify({id:id}), 
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					mui.hideLoading();
+					mui.toast(data.message);
+					if(data.flag)
+						location.reload();
+				},
+				error:function(xhr,type,errorThrown){
+					mui.hideLoading();
+					mui.toast('网络错误');
+				}
+			});
+		};
+		
+		var postMethod1  = function(url,id){
+			$.ajax(url,{
+				data:JSON.stringify({ids:id}), 
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					mui.hideLoading();
+					if(data.flag){
+						location.reload();
+					}
+					mui.toast(data.message);
+				},
+				error:function(xhr,type,errorThrown){
+					mui.hideLoading();
+					mui.toast('网络错误');
+				}
+			});
+		};
+		
+		window.addEventListener("pageflowrefresh", function (e) {
+		    location.reload();
+		});
+		
+		$.ready(function(){
+			$$('.mui-icon-clear').css('right','50px');
+			var pagehelp = pager({
+				 url:'../exam/queryPage.do'
+				,pageSize:50
+				,done:function(res){
+					$$('#searchFrm').slideUp();
+					$$(doc).scrollTop(0);
+					$$('#uuu').html(res.data.map(function(user,index){
+						var oper = '';
+						oper+=`<button type="button" data-id=${user.id} class="mui-btn-s mui-btn-primary detailBtn mui-mr5" >查看详情</button>`;
+						if(user.status==1){
+							oper+=`<button type="button" data-id=${user.id} class="mui-btn-s mui-btn-primary cancleBtn mui-mr5" >取消测试</button>`;  
+						}
+						if(user.status==1){
+							oper+=`<button type="button" data-id=${user.id} class="mui-btn-s mui-btn-primary stopBtn mui-mr5">结束测试</button>`;  
+						}
+						if(user.status==1&&user.state==1){
+							oper+=`<button type="button" data-id="${user.exam.id}" class="mui-btn-s mui-btn-primary scoreBtn mui-mr5" >测试评分</button>`;  
+						}
+						oper = oper==''?oper:`<p class="mui-mt5">${oper}</p>`;
+						return `<li class="mui-table-view-cell mui-media">
+									<a href="javascript:;">
+										<div class="mui-media-body" >
+											<span class="mui-line-height mui-font1" style="display:block;word-break: break-all;word-wrap: break-word;white-space: normal;">${(pagehelp.pageNum-1)*pagehelp.pageSize+index+1}.${'课程:'+user.courseName}</span>
+											${user.postionName!=null?'<span class="mui-line-height mui-font2">岗位:'+user.postionName+'</span>':''}
+											<span class="mui-line-height mui-font2">${'部门:'+user.department+',科室/车间:'+user.workShop+',班组:'+user.query}</span>
+											<span class="mui-line-height mui-font2">${'姓名:'+user.username+',工号:'+user.usercode}</span>
+											<p class='mui-ellipsis mui-font4'>${'考试日期从:'+user.exam.beginDate}&nbsp;${'到:'+user.exam.endDate}</p>
+											${oper}
+										</div>
+									</a>
+								</li>`;
+					}));
+					$$('.stopBtn').on('tap',function(e){
+						var id = $$(this).attr('data-id');
+						var username = $$(this).attr('username');
+						var usercode = $$(this).attr('usercode');
+						var result = $$(this).attr('result');
+						var examdate = $$(this).attr('examdate');
+						frm2.reset();
+						$$('#id').val(id);
+						$$('#result').val(result);
+						$$('#examdate').html(examdate);
+						$$('#usercode').html(usercode);
+						$$('#username').html(username);
+						window.setTimeout(function(){
+							$$('#result').removeAttr('disabled');
+						},500);
+						$('#popover1').popover('show',doc.getElementById("div"));
+					});
+					mui.hideLoading();
+				}
+			});
+			pagehelp.loadData();
+			$$('#searchBtn').on('tap',function(e){
+				var param1 = {};
+				var workGroupId = $$('#workGroup').val()*1;
+				var workShopId = $$('#workShop').val()*1;
+				var departmentId = $$('#department').val()*1;
+				if(workGroupId&&workGroupId>0){
+					param1.departmentId = workGroupId;
+				}else if(workShopId&&workShopId>0){
+					param1.departmentId = workShopId;
+				}else if(departmentId&&departmentId>0){
+					param1.departmentId = departmentId;
+				}
+				param1.query = $$("#search").val()||'';
+				pagehelp.param = param1;
+				pagehelp.loadData();
+			});
+			$('.mui-content').on('tap','.cancleBtn',function(){
+				var id = $$(this).attr('data-id');
+				var url = '../exam/cancel.do';
+				mui.showLoading('正在提交...');
+				postMethod1(url,id);
+			});
+			$('.mui-content').on('tap','.stopBtn',function(){
+				var id = $$(this).attr('data-id');
+				var url = '../exam/finish.do';
+				mui.showLoading('正在提交...');
+				postMethod(url,id);
+			});
+			$('.mui-content').on('tap','.scoreBtn',function(){
+				mui.showLoading('正在跳转...');
+				var timer = setTimeout(function(){
+					mui.hideLoading();
+				},30000);
+				var id = $$(this).attr('data-id');
+				window.location = 'score.html?id='+id;
+			});
+			
+			$('.mui-content').on('tap','.detailBtn',function(){
+				mui.showLoading('正在跳转...');
+				var timer = setTimeout(function(){
+					mui.hideLoading();
+				},30000);
+				var id = $$(this).attr('data-id');
+				window.location = 'detail.html?id='+id;
+			});
+			
+			$('.mui-bar').on('tap','#ss',function(){
+				$$('#searchFrm').slideToggle();
+			});
+			setInterval(function(){
+				if(localStorage.getItem('scorePageLoadOk')==='ok'){
+					mui.hideLoading();
+					localStorage.removeItem('scorePageLoadOk')
+				}
+			},500);
+		});
+	}(mui, document, jQuery));
+	</script>
+</html>

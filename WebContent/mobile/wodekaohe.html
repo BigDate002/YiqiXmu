@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>我的考核</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/app.css"/>
+		<link href="css/css.css" rel="stylesheet" />
+		<style>
+			.mui-bar-nav {
+				margin-bottom:0px;
+			}
+		</style>
+	<script>
+		localStorage.setItem('pageLoadOk','ok');
+	</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的考核</h1>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell" th:each="item,userStat : ${list}">
+					<span class="mui-line-height mui-font1">
+						<label style="width:30px;text-align:right;display:inline-block;" th:text="${(userStat.index+1)+'.'}"></label>
+						<label style="width:170px;display:inline-block;" th:text="${'考核日期：'+item.year+'年'+item.month+'月 '}"></label>
+						<label style="display:inline-block;" th:text="${'考核结果：'+item.result}"></label>
+					</span>
+				</li>
+			</ul>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script>
+		mui.init({
+			swipeBack:true //启用右滑关闭功能
+		});
+	</script>
+</html>

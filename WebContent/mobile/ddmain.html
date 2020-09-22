@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Expires" CONTENT="0">
+		<meta http-equiv="Cache-Control" CONTENT="no-cache">
+		<meta http-equiv="Pragma" CONTENT="no-cache">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>人员资质管理平台</title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<!-- <link rel="stylesheet" type="text/css" href="../css/iconfont.css"/> -->
+		<link href="css/css.css" rel="stylesheet" />
+		<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+		<style>
+			body{
+				background: #ffffff!important;
+			}
+			ul {
+				font-size: 14px;
+				color: #8f8f94;
+			}
+			.mui-grid-view.mui-grid-9{
+				background: #ffffff!important;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+
+			.mui-grid-view.mui-grid-9 .mui-media {
+				color: blue;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<h1 class="mui-title">人员资质管理平台</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content">
+			<div class="mui-index-title">
+			<span id="glpt">管理平台</span>
+			<ul class="mui-table-view mui-grid-view mui-grid-9" id="a1">
+				<li shiro:hasPermission="17" class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="train" data-href="train.html">
+						<div class="ap-btn ap-btn-pxzx"><img src="images/icon-pxzx.png" /></div>
+						<div class="mui-media-body mui-ico-font">培训中心</div>
+					</a></li>
+
+				<li shiro:hasPermission="18" class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="ceshi" data-href="ceshi.html">
+						<div class="ap-btn ap-btn-cszx"><img src="images/icon-cszx.png" /></div>
+						<div class="mui-media-body mui-ico-font">测试中心</div>
+					</a></li>
+
+				<li shiro:hasPermission="19" class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="zizhi" data-href="zizhi.html">
+						<div class="ap-btn ap-btn-ryzz"><img src="images/icon-ryzz.png" /></div>
+						<div class="mui-media-body mui-ico-font">人员资质</div>
+					</a></li>
+				<li shiro:hasPermission="34" class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="kaohe" data-href="kaohe.html">
+						<div class="ap-btn ap-btn-ryzz"><img src="images/icon-khjg.png" /></div>
+						<div class="mui-media-body mui-ico-font">考核结果</div>
+					</a></li>	
+			</ul>
+			<span>个人中心</span>
+			<ul class="mui-table-view mui-grid-view mui-grid-9" style="margin-bottom: 80px;">
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="mytrain1" data-href="mytrain1.html">
+						<div class="ap-btn ap-btn-dpx"><img src="images/icon-dpx.png" /><span class="mui-badge" th:text="${n1}"></span></div>
+						<div class="mui-media-body mui-ico-font">待培训</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="mytrain2" data-href="mytrain2.html">
+						<div class="ap-btn ap-btn-ypx"><img src="images/icon-ypx.png" /><span class="mui-badge" th:text="${n2}"></span></div>
+						<div class="mui-media-body mui-ico-font">已培训</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="test1" data-href="test1.html">
+						<div class="ap-btn ap-btn-dcs"><img src="images/icon-dcs.png" /><span class="mui-badge" th:text="${m1}"></span></div>
+						<div class="mui-media-body mui-ico-font">待测试</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="test2" data-href="test2.html">
+						<div class="ap-btn ap-btn-ycs"><img src="images/icon-ycs.png" /><span class="mui-badge" th:text="${m2}"></span></div>
+						<div class="mui-media-body mui-ico-font">已测试</div>
+					</a></li>
+
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="qualify" data-href="qualify.html">
+						<div class="ap-btn ap-btn-wdzz"><img src="images/icon-wdzz.png" /></div>
+						<div class="mui-media-body mui-ico-font">我的资质</div>
+					</a></li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="wodekaohe" data-href="wodekaohe.html">
+						<div class="ap-btn ap-btn-wdzz"><img src="images/icon-wdkh.png" /></div>
+						<div class="mui-media-body mui-ico-font">我的考核</div>
+					</a></li>	
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="userinfo" data-href="userinfo.html">
+						<div class="ap-btn ap-btn-wdxx"><img src="images/icon-wdxx.png" /></div>
+						<div class="mui-media-body mui-ico-font">我的信息</div>
+					</a></li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+					<a class="mlink" data-id="editpwd" data-href="editpwd.html">
+						<div class="ap-btn ap-btn-xgmm"><img src="images/icon-xgmm.png" /></div>
+						<div class="mui-media-body mui-ico-font">密码修改</div>
+					</a></li>
+			</ul>
+			<!-- <div style="background: #fff;width: 100%;position:fixed;bottom:0px;height: 65px;">
+				<div class="mui-content-padded" style="position:fixed;width:95%;bottom:0px;background: #ffffff;">
+					<button id='exit' class="mui-btn mui-btn-block mui-btn-blue">注销</button>
+				</div>
+			</div> -->
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/loading.js"></script>
+		<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+		<script>
+			(function($, doc,$$) {
+				$.init({
+					swipeBack:false
+				});
+				if($$("#a1").find("li").length==0){
+					$$('#glpt').hide();
+				}
+				var account = doc.getElementById('account');
+				$$('.mlink').on('tap',function(e){
+					$.showLoading('正在加载...');
+					var timer = setTimeout(function(){
+						mui.hideLoading();
+					},30000);
+					window.location = $$(this).attr('data-href');
+				});
+				setInterval(function(){
+					if(localStorage.getItem('pageLoadOk')==='ok'){
+						mui.hideLoading();
+						localStorage.removeItem('pageLoadOk')
+					}
+				},500);
+				window.addEventListener("swipedown",function(){
+					mui.showLoading('开始刷新...');
+					location.reload();
+				});
+			}(mui, document, jQuery));
+		</script>
+	</body>
+
+</html>

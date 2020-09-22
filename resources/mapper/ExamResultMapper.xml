@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.ExamResult">
+	<resultMap type="com.netcity.module.entity.ExamResultEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="usercode" property="usercode" />
+		<result column="year" property="year" />
+		<result column="month" property="month" />
+		<result column="result" property="result" />
+		<result column="createUser" property="createUser" />
+		<result column="createTime" property="createTime" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_exam_result
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			id,
+			usercode,
+			year,
+			month,
+			result,
+			createUser,
+			createTime,
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="usercode!=null and usercode !=''">
+				and a.usercode like concat('%',#{usercode},'%')
+			</if>
+			<if test="username !=null and username !=''">
+				and c.name like concat('%',#{username},'%')
+			</if>
+			<if test="year!=null ">
+				and a.year = #{year}
+			</if>
+			<if test="month!=null ">
+				and a.month = #{month}
+			</if>
+			<if test="result!=null and result !=''">
+				and a.result = #{result}
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and a.createUser = #{createUser}
+			</if>
+			<if test="createTime!=null ">
+				and a.createTime = #{createTime}
+			</if>
+			<if test="department !=null and department !=''">
+				and b.department like concat('%',#{department},'%')
+			</if>
+			<if test="workShop !=null and workShop !=''">
+				and b.workShop like concat('%',#{workShop},'%')
+			</if>
+			<if test="workGroup !=null and workGroup !=''">
+				and b.workGroup like concat('%',#{workGroup},'%')
+			</if>
+			<if test="departmentId !=null and departmentId!=3756">
+				and (b.departmentId=#{departmentId} or b.workShopId=#{departmentId} or b.workGroupId=#{departmentId})
+			</if>
+			<if test="beginDate !=null and beginDate !=''">
+				and concat(year,'年',right(concat('0',month),2),'月') &gt;= #{beginDate}
+			</if>
+			<if test="endDate !=null and endDate !=''">
+				and concat(year,'年',right(concat('0',month),2),'月') &lt;= #{endDate}
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.ExamResultEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.ExamResultEntity" parameterType="com.netcity.module.entity.ExamResultEntity">
+		select
+			a.id,
+			a.usercode,
+			a.year,
+			a.month,
+			a.result,
+			a.createUser,
+			a.createTime,
+			c.name as username,
+			b.workGroup,
+			b.workShop,
+			b.department
+		from
+		<include refid="TABLE_NAME"></include> a
+		join ex_user c on c.usercode=a.usercode
+		join view_depart b on c.deptId=b.deptId
+		<if test="roleId !=null ">
+			join ex_user_department d on d.roleId=#{roleId} and d.deptId=b.deptId 
+		</if>
+		<include refid="WHERE_CLAUSE"></include>
+		order by year desc,month desc,id
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.ExamResultEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.ExamResultEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="usercode !=null">
+				usercode=#{usercode},
+			</if>
+			<if test="year !=null">
+				year=#{year},
+			</if>
+			<if test="month !=null">
+				month=#{month},
+			</if>
+			<if test="result !=null">
+				result=#{result},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createTime !=null">
+				createTime=#{createTime},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+	
+	<insert id="insertBatchOnce" parameterType="java.util.List">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			usercode,
+			year,
+			month,
+			result,
+			createUser
+		)
+		values
+		<foreach collection="list" item="item" separator=",">
+		(
+			#{item.usercode},
+			#{item.year},
+			#{item.month},
+			#{item.result},
+			#{item.createUser}
+		)
+		</foreach>
+		ON DUPLICATE KEY UPDATE result=VALUES(result);
+	</insert>
+	
+	<insert id="insert" parameterType="com.netcity.module.entity.ExamResultEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			usercode,
+			year,
+			month,
+			result,
+			createUser
+		)
+		values (
+			#{usercode},
+			#{year},
+			#{month},
+			#{result},
+			#{createUser}
+		)
+	</insert>
+</mapper>

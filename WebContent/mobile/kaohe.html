@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title>培训</title>
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link href="css/mui.min.css" rel="stylesheet" />
+<link href="css/css.css" rel="stylesheet" />
+<link href="css/mui.picker.min.css" rel="stylesheet" />
+<link th:href="'css/loading.css?version='+${new java.util.Date().getTime()}" rel="stylesheet" />
+<style>
+
+.mui-input-row label~input{
+	float:left;
+}
+.mbar{
+	overflow: hidden;
+	background: #fff;
+	padding: 15px;
+	padding-bottom: 0;
+}
+.mbar button {
+/* 	float: left; */
+	width: 48%;
+	height: 36px;
+/* 	margin: 0 5%; */
+}
+.mbar_fl{
+	float: left; 
+}
+.mbar_fr{
+	float: right; 
+}
+.mui-table-view:before {
+	height: 0;
+}
+#frm2 .datepicker{
+	opacity: 0;
+	width: 65%;
+}
+button.datepicker {
+	width: 65%!important;
+	opacity: 0;
+}
+.mui-table-view-cell:after {
+	right: 15px;
+}
+ .mui-input-group .mui-input-row:after {
+	right: 15px;
+}
+ a.xzr {
+	right: 15px!important;
+}
+ .mui-input-group .mui-input-row {
+	height: auto!important;
+}
+ div#course {
+	position: initial;
+}
+ .mui-input-row label {
+	padding: 0px !important;
+}
+ .mui-input-row select {
+	display: block;
+	margin-bottom: 5px!important;
+}
+.mui-input-group .mui-input-row {
+    height: auto!important;
+}
+.mui-table-view-cell{
+	padding-top:5px;padding-bottom:5px;
+}
+</style>
+<script>
+	localStorage.setItem('pageLoadOk','ok');
+</script>
+</head>
+
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">考核结果</h1>
+		<div id="div"></div>
+	</header>
+	<div class="mui-content">
+		<div class="mbar">
+			<button id='btn2' class="mui-btn-blue mbar_fl">发布考核结果</button>
+		</div>
+		<ul class="mui-table-view" id="uuu" style="padding-bottom:45px;">
+		</ul>
+		
+		<div id="popover2" class="mui-popover" data-disable-auto-close="true" style="width: 100%">
+			<form class="mui-input-group" id="frm3">
+				<div class="mui-input-row">
+					<label style="padding: 20px!important;padding-left:5px!important;padding-right:0px!important;width:110px;">考核日期</label>
+					<input id="beginDate" style="float:left!importmant;" type="text" placeholder="请选择开始日期" name="beginDate" readonly="readonly" class="mui-input-clear mui-h57 font16"/>
+					<button type="button" style="position:fixed;left:0px" class="mui-btn mui-btn-primary datepicker mui-h57">选择</button>
+				</div>
+				<div class="mui-input-row mui-scroll" style="height:250px;">
+					<label style="padding: 15px !important;padding-left:5px!important;padding-right:0px!important;width:80px;">考核人员</label>
+          			<ul class="mui-table-view" style="background-color: transparent;margin-top:16px;">
+						<li th:if=${userStat.index==0} style="padding-left:0px;padding-top: 0px;padding-bottom:3px;" class="mui-table-view-cell" th:each="item,userStat : ${users}">
+							<span class="mui-line-height mui-font1" style="line-height:18px;padding:0px!importmant;">
+								<label style="width:120px;display:inline-block;height:18px;text-align:center;">工号</label>
+								<label style="width:70px;display:inline-block;height:18px;text-align:center;">姓名</label>
+								<label style="width:60px;margin-left:10px;display:inline-block;height:18px;text-align:center;">结果</label>
+							</span>
+						</li>
+						<li style="padding-left:0px;padding-top: 3px;padding-bottom:0px;" class="mui-table-view-cell" th:each="item,userStat : ${users}">	
+							<span class="mui-line-height mui-font1" style="line-height:18px;padding:0px!importmant;">
+								<label style="width:120px;display:inline-block;height:18px;" th:text="${item.usercode}"></label>
+								<label style="width:70px;display:inline-block;height:18px;" th:text="${item.name}"></label>
+								<input placeholder="请输入" th:name="${item.usercode}" style="height:18px;width:60px;float:left;margin-left:10px;margin-top:-2px;" />
+							</span>
+						</li>
+					</ul>
+				</div>
+				<div class="mui-button-row mbar mui-h67">
+					<button type="button" id="btnOk1" class="mui-btn mui-btn-blue mbar_fl">确认</button>
+					<button type="button" id="btnCancle1" class="mui-btn mui-btn-white mbar_fr">取消</button>
+				</div>
+			</form>
+		</div>
+		
+		<div id="popover1" class="mui-popover" data-disable-auto-close="true" style="width: 100%">
+			<form class="mui-input-group" id="frm2">
+				<input type="text" id="id" name="id" style="display:none;" />
+				<div class="mui-input-row">
+					<label style="padding: 20px !important;">日期</label>
+					<label style="padding: 20px !important;padding-left: 0px !important;" id="examdate"></label>
+				</div>
+				<div class="mui-input-row">
+					<label style="padding: 20px !important;">工号</label>
+					<label style="padding: 20px !important;padding-left: 0px !important;" id="usercode"></label>
+				</div>
+				<div class="mui-input-row">
+					<label style="padding: 20px !important;">姓名</label>
+					<label style="padding: 20px !important;padding-left: 0px !important;" id="username"></label>
+				</div>
+				<div class="mui-input-row">
+					<label style="padding: 20px !important;">考核结果</label>
+					<select id="result" disabled="disabled" name="result">
+						<option value="">请选择考核结果</option>
+						<option value="A">A</option>
+						<option value="B">B</option>
+						<option value="C">C</option>
+						<option value="D">D</option>
+						<option value="E">E</option>
+					</select>
+				</div>
+				<div class="mui-button-row mbar mui-h67">
+					<button type="button" id="btnYes" class="mui-btn mui-btn-blue mbar_fl">确认</button>
+					<button type="button" id="btnQuxiao" class="mui-btn mui-btn-white mbar_fr">取消</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div style="position:fixed;width:100%; background:#fff; padding:8px 0; bottom:0; text-align:center;">
+		<ul id="pagination" class="mui-pagination">
+		</ul>
+	</div>
+	<iframe style="display: none;position: absolute; top: 0px;" id="checkuser" frameborder="0" width="100%" height="100%"></iframe>
+</body>
+<script src="js/mui.min.js"></script>
+<script src="js/mui.picker.min.js"></script>
+<script th:src="'js/loading.js?version='+${new java.util.Date().getTime()}"></script>
+<script src="../plugins/jquery/jquery-1.9.1.js"></script>
+<script src="../plugins/jquery/jquery.serializejson.js"></script>
+<script th:src="'js/pager.js?version='+${new java.util.Date().getTime()}"></script>
+<script>
+	(function($, doc,$$) {
+		$.init({
+			swipeBack:true
+		});
+		var abcd;
+		var target;
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth();
+		month = month==0?12:month;
+		year = month==0?year-1:year;
+		$.ready(function(){
+			var pagehelp = pager({
+				 url:'../examresult/queryPageI.do'
+				,pageSize:50
+				,done:function(res){
+					$$(doc).scrollTop(0);
+					$$('#uuu').html(res.data.map(function(item,index){
+						var oper = (item.year==year&&item.month>month)?`<button type="button" data-id=${item.id} examdate=${item.year+'年'+item.month+'月'} usercode=${item.usercode} username=${item.username} result=${item.result} class="mui-btn mui-btn-primary stopBtn" >修改</button></p>`:'';
+						return `<li class="mui-table-view-cell">
+									<span class="mui-line-height mui-font1">
+										<label style="width:120px;display:inline-block;">${(pagehelp.pageNum-1)*pagehelp.pageSize+index+1}${'.工号:'+item.usercode}</label>
+										<label style=";display:inline-block;">${'姓名:'+item.username}</label>
+									</span>
+									<span class="mui-line-height mui-font1">
+										<label style="width:120px;display:inline-block;">${'日期:'+item.year+'年'+item.month+'月 '}</label>
+										<label style="display:inline-block;">${'结果:'+item.result}</label>
+									</span>
+									${oper}								
+								</li>`;
+					}));
+					$$('.stopBtn').on('tap',function(e){
+						var id = $$(this).attr('data-id');
+						var username = $$(this).attr('username');
+						var usercode = $$(this).attr('usercode');
+						var result = $$(this).attr('result');
+						var examdate = $$(this).attr('examdate');
+						frm2.reset();
+						$$('#id').val(id);
+						$$('#result').val(result);
+						$$('#examdate').html(examdate);
+						$$('#usercode').html(usercode);
+						$$('#username').html(username);
+						window.setTimeout(function(){
+							$$('#result').removeAttr('disabled');
+						},500);
+						$('#popover1').popover('show',doc.getElementById("div"));
+					});
+					mui.hideLoading();
+				}
+			});
+			pagehelp.loadData();
+			$$('#uuu').css('font-size','13px');
+			$$('#uuu').find('span').css('line-height','18px');
+			var hhh= $$(window).height()-110;
+			if($$('#popover2').height()>hhh){
+				var scroll = $(".mui-scroll-wrapper").scroll();
+				$$('#popover2').height(hhh);
+				$('#popover2').scroll();
+			}
+		});
+		$('.mbar').on('tap','#btn2',function(){
+			frm3.reset();
+			$$('#beginDate').val(`${year}年${month}月`);
+			$('#popover2').scroll().scrollTo(0,0);
+			$('#popover2').popover('show',doc.getElementById("btn2"));
+			abcd = 'popover2';
+		});
+		
+		$$('#btnCancle1').on('tap',function(){
+			$('#popover2').popover('hide');
+		});
+		
+		$$('#btnQuxiao').on('tap',function(){
+			$$('#result').attr('disabled','disabled');
+			$('#popover1').popover('hide');
+		});
+		
+		$$('#btnYes').on('tap',function(e){
+			mui.showLoading('正在保存,请稍候...');
+			$$('#btnYes').attr('disabled','disabled');
+			var data = $$('#frm2').serializeJSON();
+			$.ajax('../examresult/update.do?requestTime='+new Date().getTime(),{
+				data: data,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					$$('#btnYes').removeAttr("disabled");
+					mui.hideLoading();
+					mui.toast(data.message);
+					if(data.flag){
+						$('#popover1').popover('hide');						
+						location.reload();
+					}
+				}
+			});
+		});
+				
+		$$('#btnOk1').on('tap',function(){
+			$$('#btnOk1').attr('disabled','disabled');
+			var obj = $$('#frm3').serializeJSON();
+			for(key in obj){
+				if(obj[key]==''){
+					mui.toast('请选择'+key+'考核结果');
+					return;
+				}
+			}
+			mui.showLoading('正在保存,请稍候...');
+			$.ajax('../examresult/tianjia.do?requestTime='+new Date().getTime(),{
+				data: obj,
+				dataType:'json',
+				type:'post',
+				timeout:45000,
+				headers:{'Content-Type':'application/json'},              
+				success:function(data){
+					$$('#btnOk1').removeAttr('disabled');
+					mui.hideLoading();
+					mui.toast(data.message);
+					if(data.flag){
+						$('#popover2').popover('hide');						
+						location.reload();
+					}
+				}
+			});
+		});
+		
+		$$('.datepicker').on('tap',function(e){
+			var el = $$(this).siblings('input');
+			var dtpicker = new mui.DtPicker({
+			    type: 'month'
+			})
+			dtpicker.show(function(e) {
+				var y = e.y.text;  //获取选择的年
+                var m = e.m.text;  //获取选择的月
+                var date = y + "年" + m +  '月';
+			   	el.val(date);
+				dtpicker.dispose();
+			})
+		});		
+		
+	}(mui, document, jQuery));
+	
+	function aa(){
+		var query = $("#search").val().toUpperCase();
+		if(query==''){
+			$('.li').show();
+		}else{
+			$('.li').hide();
+			$("[data-name*="+query+"],[data-id*="+query+"]").show();
+		}
+		return false;
+	}
+	</script>
+</html>

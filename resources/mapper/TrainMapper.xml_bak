@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Train">
+	<resultMap type="com.netcity.module.entity.TrainEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="beginDate" property="beginDate" />
+		<result column="endDate" property="endDate" />
+		<result column="state" property="state" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<result column="postionId" property="postionId" />
+	</resultMap>
+	<sql id="TABLE_NAME">
+		ex_train
+	</sql>
+	<sql id="BASE_COLUMNS">
+		id,
+		beginDate,
+		endDate,
+		state,
+		createUser,
+		createDate,
+		postionId,
+		type
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and a.id = #{id}
+			</if>
+			<if test="beginDate!=null ">
+				and a.beginDate = #{beginDate}
+			</if>
+			<if test="endDate!=null ">
+				and a.endDate = #{endDate}
+			</if>
+			<if test="state!=null ">
+				and a.state = #{state}
+			</if>
+			<if test="roleId !=null ">
+				and f.deptId in (select ff.deptId from ex_user_department ff where ff.roleId=#{roleId})
+			</if>
+			<if test="createUser!=null and createUser !=''">
+				and g.usercode = #{createUser}
+			</if>
+			<if test="postionId!=null ">
+				and a.postionId = #{postionId}
+			</if>
+			<if test="createDate!=null ">
+				and a.createDate = #{createDate}
+			</if>
+			<if test="usercode !=null and usercode !=''">
+				and g.usercode = #{usercode}
+			</if>
+			<if test="courseName!=null and courseName!=''">
+				and f.name = #{courseName}
+			</if>
+			<if test="position !=null and position !=''">
+				and d.name = #{position}
+			</if>
+			<if test="departmentId!=null">
+				and (i.code=#{departmentId} or j.code=#{departmentId} or k.code=#{departmentId})
+			</if>
+			<if test="query!=null and query !=''">
+				and (u.name like concat('%',#{query},'%') or g.usercode like concat('%',#{query},'%'))
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.TrainEntity" parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include> a
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.TrainEntity" parameterType="com.netcity.module.entity.TrainEntity">
+		select
+		a.id,
+		a.beginDate,
+		a.endDate,
+		a.state,
+		a.createUser,
+		a.createDate,
+		(select group_concat(ff.name order by ff.id) from ex_train_course ee join ex_course ff on ee.courseId=ff.id where ee.trainId=a.id) as courseName,
+		a.type,
+		a.postionId,
+		d.name as position,
+		(select group_concat(uu.name order by uu.id) from ex_user uu join ex_train_user gg on gg.usercode=uu.usercode where gg.refid=a.id) as username
+		,i.name as workShop
+		,j.name as department
+		,k.name as workGroup
+		from
+		ex_train a
+		left join ex_position d on a.postionId=d.id 
+		left join ex_train_course e on e.trainId=a.id
+		left join ex_course f on e.courseId=f.id
+		join ex_train_user g on g.refid=a.id
+		join ex_user u on u.usercode=g.usercode
+		left join ex_department i on i.code=d.deptId
+		left join ex_department j on i.parentId=j.code
+		left join ex_department k on k.code=d.workGroupId
+		<include refid="WHERE_CLAUSE"></include>
+		group by a.id
+		order by a.id desc
+	</select>
+	<select id="selectByCond" resultType="com.netcity.module.entity.TrainEntity" parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.TrainEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="beginDate !=null">
+				beginDate=#{beginDate},
+			</if>
+			<if test="endDate !=null">
+				endDate=#{endDate},
+			</if>
+			<if test="state !=null">
+				state=#{state},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+			<if test="updateUser !=null">
+				updateUser=#{updateUser},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.TrainEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+			beginDate,
+			endDate,
+			state,
+			createUser,
+			createDate,
+			postionId,
+			type
+		)
+		values (
+			#{beginDate},
+			#{endDate},
+			1,
+			#{createUser},
+			now(),
+			#{postionId},
+			#{type}
+		)
+	</insert>
+
+	<select id="queryUserbypostion" resultType="com.netcity.module.entity.UserEntity" parameterType="com.netcity.module.entity.TrainEntity">
+		select
+		 a.id
+		,a.name
+		,a.usercode
+		,case c.level when '三级' then c.name else b.name end workShop
+		,case d.level when '二级' then d.name else c.name end as department
+		,case b.level when '四级' then b.name else '——' end as dept
+		from ex_user a
+		join ex_department b on a.deptId=b.code
+		join ex_department c on b.parentId=c.code
+		join ex_department d on c.parentId=d.code
+		<where>
+			<if test="query!=null and query !=''">
+				and (a.name like concat('%',#{query},'%') or a.usercode like concat('%',#{query},'%'))
+			</if>
+			<if test="departmentId!=null">
+				and (b.code=#{departmentId} or c.code=#{departmentId} or d.code=#{departmentId})
+			</if>
+			and exists(select 1 from ex_user_department f where f.roleId=#{roleId} and f.deptId=a.deptId)
+			<!-- <if test="id !=null"> and not exists(select 1 from ex_train_user c join ex_train_position b on b.trainId=c.refid and b.positionId = #{id} join 
+				ex_train d on d.id=c.refid and d.state=1 where a.usercode=c.usercode) </if> <if test="query!=null and query!=''"> and (a.name like '%${query}%' or a.usercode 
+				like '%{query}%') </if> -->
+		</where>
+	</select>
+
+</mapper>

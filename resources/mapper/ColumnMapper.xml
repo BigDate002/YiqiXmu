@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.netcity.module.entity.Column">
+	<resultMap type="com.netcity.module.entity.ColumnEntity" id="BookResultMap">
+		<result column="id" property="id" />
+		<result column="code" property="code" />
+		<result column="name" property="name" />
+		<result column="name" property="title" />
+		<result column="url" property="url" />
+		<result column="parentId" property="parentId" />
+		<result column="descript" property="descript" />
+		<result column="icon" property="icon" />
+		<result column="sort" property="sort" />
+		<result column="visible" property="visible" />
+		<result column="createUser" property="createUser" />
+		<result column="createDate" property="createDate" />
+		<!-- <collection property="childrens" column="id=id,roleId=roleId"
+			select="selectByPid" ofType="com.netcity.module.entity.ColumnEntity"
+			javaType="ArrayList">
+		</collection> -->
+	</resultMap>
+	<select id="selectByPid" resultMap="BookResultMap"
+		parameterType="com.netcity.module.entity.ColumnEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where parentId=#{id}
+		and exists(select * from ex_role_column where roleId=#{roleId} and columnId=ex_column.id)
+		and visible = 1
+		order by sort
+	</select>
+	<sql id="TABLE_NAME">
+		ex_column
+	</sql>
+	<sql id="BASE_COLUMNS">
+		<trim suffixOverrides=",">
+			id,
+			code,
+			name,
+			url,
+			parentId,
+			descript,
+			icon,
+			createUser,
+			createDate,
+			${roleId} as roleId,
+			exists(select 1 from
+			ex_role_column where roleId=#{roleId} and columnId=ex_column.id) as checked,
+			sort,
+			visible
+		</trim>
+	</sql>
+	<sql id="WHERE_CLAUSE">
+		<where>
+			<if test="id!=null">
+				and id = #{id}
+			</if>
+			<if test="code!=null">
+				and code = #{code}
+			</if>
+			<if test="name!=null">
+				and name = #{name}
+			</if>
+			<if test="url!=null">
+				and url = #{url}
+			</if>
+			<if test="parentId!=null">
+				and parentId = #{parentId}
+			</if>
+			<if test="descript!=null">
+				and descript = #{descript}
+			</if>
+			<if test="icon!=null">
+				and icon = #{icon}
+			</if>
+			<if test="createUser!=null">
+				and createUser = #{createUser}
+			</if>
+			<if test="createDate!=null">
+				and createDate = #{createDate}
+			</if>
+			<if test="visible !=null">
+				and visible = #{visible}
+			</if>
+			<if test="checked!=null and checked">
+				and exists(select * from ex_role_column where roleId=#{roleId} and columnId=ex_column.id)
+			</if>
+		</where>
+	</sql>
+	<select id="selectById" resultType="com.netcity.module.entity.ColumnEntity"
+		parameterType="java.lang.Long">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</select>
+	<select id="selectByEntity" resultType="com.netcity.module.entity.ColumnEntity"
+		parameterType="com.netcity.module.entity.ColumnEntity">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+		Order by sort
+	</select>
+	<select id="selectByCond" resultMap="BookResultMap"
+		parameterType="java.util.Map">
+		select
+		<include refid="BASE_COLUMNS"></include>
+		from
+		<include refid="TABLE_NAME"></include>
+		<include refid="WHERE_CLAUSE"></include>
+		order by
+		case parentid when 0 then id else parentid end,
+		case parentid when 0 then 0 else sort end
+	</select>
+	<update id="updateById" parameterType="com.netcity.module.entity.ColumnEntity">
+		update
+		<include refid="TABLE_NAME"></include>
+		set
+		<trim suffixOverrides=",">
+			<if test="code !=null">
+				code=#{code},
+			</if>
+			<if test="name !=null">
+				name=#{name},
+			</if>
+			<if test="url !=null">
+				url=#{url},
+			</if>
+			<if test="parentId !=null">
+				parentId=#{parentId},
+			</if>
+			<if test="descript !=null">
+				descript=#{descript},
+			</if>
+			<if test="icon !=null">
+				icon=#{icon},
+			</if>
+			<if test="createUser !=null">
+				createUser=#{createUser},
+			</if>
+			<if test="createDate !=null">
+				createDate=#{createDate},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from
+		<include refid="TABLE_NAME"></include>
+		where id = #{id}
+	</delete>
+
+	<insert id="insert" parameterType="com.netcity.module.entity.ColumnEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		<include refid="TABLE_NAME"></include>
+		(
+		<trim suffixOverrides=","> code,
+			name,
+			url,
+			parentId,
+			descript,
+			icon,
+			createUser,
+			createDate,
+		</trim>
+		)
+		values (
+		<trim suffixOverrides=",">
+			#{code},
+			#{name},
+			#{url},
+			#{parentId},
+			#{descript},
+			#{icon},
+			#{createUser},
+			now(),
+		</trim>
+		)
+	</insert>
+	
+	<select id="getPersonInfo" resultType="java.util.Map" parameterType="com.netcity.module.entity.UserEntity">
+		select 
+		(select count(1) from ex_train aa join ex_train_user cc on cc.refId=aa.id
+		 where aa.state=1 and cc.userCode=a.userCode) as 待培训,
+		(select count(1) from ex_train aa join ex_train_user cc on cc.refId=aa.id
+		where aa.state=2 and cc.userCode=a.userCode) as 已培训,
+		sum(case when d.state=0 and d.status=1 then 1 else 0 end) as 待测试,
+		sum(case when d.state is null or d.state = 0 or d.state=1 then 0 else 1 end) as 已测试
+		from ex_user a
+		left join ex_exam_user d on d.usercode=a.usercode and d.status &lt; 3
+		where a.usercode=#{usercode}
+		group by a.usercode
+	</select>
+</mapper>
